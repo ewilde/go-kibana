@@ -7,11 +7,11 @@ import (
 )
 
 type TestContext struct {
-	containers      []container
-	KongHostAddress string
+	containers []container
+	KibanaUri  string
 }
 
-func StartKong(kongVersion string) *TestContext {
+func StartKibana() *TestContext {
 	log.SetOutput(os.Stdout)
 
 	var err error
@@ -20,13 +20,12 @@ func StartKong(kongVersion string) *TestContext {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	postgres := NewPostgresContainer(pool)
-	kong := NewKongContainer(pool, postgres, kongVersion)
-
-	return &TestContext{containers: []container{postgres, kong}, KongHostAddress: kong.HostAddress}
+	elasticSearch := NewElasticSearchContainer(pool)
+	kibana := NewKibanaContainer(pool, elasticSearch)
+	return &TestContext{containers: []container{elasticSearch, kibana}, KibanaUri: kibana.Uri}
 }
 
-func StopKong(testContext *TestContext) {
+func StopKibana(testContext *TestContext) {
 
 	for _, container := range testContext.containers {
 		err := container.Stop()

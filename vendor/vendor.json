@@ -39,6 +39,12 @@
 			"revisionTime": "2017-11-21T02:38:13Z"
 		},
 		{
+			"checksumSHA1": "mrz/kicZiUaHxkyfvC/DyQcr8Do=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "ecdeabc65495df2dec95d7c4a4c3e021903035e5",
+			"revisionTime": "2017-10-02T20:02:53Z"
+		},
+		{
 			"checksumSHA1": "HoN/78ovv3/DC+kDKF7IENEc40g=",
 			"path": "github.com/docker/docker/api/types",
 			"revision": "dfe2c023a34de3e1731e789f4344ef4d85070bc6",
@@ -267,10 +273,22 @@
 			"revisionTime": "2017-10-18T19:55:50Z"
 		},
 		{
+			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
+			"revisionTime": "2016-01-10T10:55:54Z"
+		},
+		{
 			"checksumSHA1": "pOsyzLxA9jL375TDmbDdsgiMPl8=",
 			"path": "github.com/sirupsen/logrus",
 			"revision": "95cd2b9c79aa5e72ab0bc69b7ccc2be15bf850f6",
 			"revisionTime": "2017-11-18T12:42:23Z"
+		},
+		{
+			"checksumSHA1": "mGbTYZ8dHVTiPTTJu3ktp+84pPI=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "2aa2c176b9dab406a6970f6a55f513e8a8c8b18f",
+			"revisionTime": "2017-08-14T20:04:35Z"
 		},
 		{
 			"checksumSHA1": "4vi1yAnCfc+roJdMn/VZeHxlHj0=",

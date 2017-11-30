@@ -8,7 +8,7 @@ default: build test
 build: fmtcheck errcheck vet
 	go install
 
-test: fmtcheck
+test: docker fmtcheck
 	go test -v ./...
 
 vet:
@@ -40,4 +40,6 @@ test-compile:
 	fi
 	go test -c $(TEST) $(TESTARGS)
 
-.PHONY: build test testacc vet fmt fmtcheck errcheck vendor-status test-compile
+docker:
+	cd docker/elasticsearch && docker build . -t elastic-local:6.0.0
+.PHONY: build docker test testacc vet fmt fmtcheck errcheck vendor-status test-compile
