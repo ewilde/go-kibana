@@ -1,16 +1,3 @@
-[![Build Status](https://travis-ci.org/ewilde/go-kibana.svg?branch=master)](https://travis-ci.org/ewilde/go-kibana) [![GoDoc](https://godoc.org/github.com/ewilde/go-kibana?status.svg)](https://godoc.org/github.com/ewilde/go-kibana) 
-
-# go-kibana
-go-kibana is a [go](https://golang.org/) client library for [kibana](https://github.com/elastic/kibana)
-
-## Installation
-
-```
-go get github.com/ewilde/go-kibana
-```
-
-## Usage
-```go
 package examples
 
 import (
@@ -44,8 +31,3 @@ func createSearch() (*kibana.SearchResponse, error) {
 
 	return client.Search().Create(request)
 }
-```
-
-### All Resources and Actions
-Complete examples can be found in the [examples folder](examples) or
-in the unit tests

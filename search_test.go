@@ -10,7 +10,7 @@ func Test_SearchCreate(t *testing.T) {
 	client := NewClient(NewDefaultConfig())
 
 	requestSearch, err := NewSearchSourceBuilder().
-		WithIndexId(client.config.DefaultIndexId).
+		WithIndexId(client.Config.DefaultIndexId).
 		WithFilter(&SearchFilter{
 			Query: &SearchFilterQuery{
 				Match: map[string]*SearchFilterQueryAttributes{
@@ -34,7 +34,7 @@ func Test_SearchCreate(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	response, err := NewClient(NewDefaultConfig()).Search().Create(request)
+	response, err := client.Search().Create(request)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
@@ -55,7 +55,7 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 	client := NewClient(NewDefaultConfig())
 
 	requestSearch, err := NewSearchSourceBuilder().
-		WithIndexId(client.config.DefaultIndexId).
+		WithIndexId(client.Config.DefaultIndexId).
 		WithFilter(&SearchFilter{
 			Query: &SearchFilterQuery{
 				Match: map[string]*SearchFilterQueryAttributes{
@@ -89,7 +89,7 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	response, err := NewClient(NewDefaultConfig()).Search().Create(request)
+	response, err := client.Search().Create(request)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, response)

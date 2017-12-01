@@ -12,7 +12,7 @@ func Test_Newclient(t *testing.T) {
 	result := NewClient(NewDefaultConfig())
 
 	assert.NotNil(t, result)
-	assert.Equal(t, os.Getenv(EnvKibanaUri), result.config.HostAddress)
+	assert.Equal(t, os.Getenv(EnvKibanaUri), result.Config.HostAddress)
 }
 
 func TestMain(m *testing.M) {
