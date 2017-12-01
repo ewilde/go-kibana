@@ -18,7 +18,7 @@ type Config struct {
 }
 
 type KibanaClient struct {
-	config *Config
+	Config *Config
 	client *gorequest.SuperAgent
 }
 
@@ -40,21 +40,21 @@ func NewDefaultConfig() *Config {
 
 func NewClient(config *Config) *KibanaClient {
 	return &KibanaClient{
-		config: config,
+		Config: config,
 		client: gorequest.New(),
 	}
 }
 
 func (kibanaClient *KibanaClient) Search() *SearchClient {
 	return &SearchClient{
-		config: kibanaClient.config,
+		config: kibanaClient.Config,
 		client: kibanaClient.client,
 	}
 }
 
 func (kibanaClient *KibanaClient) SavedObjects() *SavedObjectsClient {
 	return &SavedObjectsClient{
-		config: kibanaClient.config,
+		config: kibanaClient.Config,
 		client: kibanaClient.client,
 	}
 }
