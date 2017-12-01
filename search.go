@@ -6,7 +6,6 @@ import (
 	"github.com/ewilde/go-kibana/containers"
 	"github.com/parnurzeal/gorequest"
 	"github.com/pkg/errors"
-	"log"
 )
 
 const (
@@ -91,10 +90,6 @@ func (api *SearchClient) Create(request *SearchRequest) (*SearchResponse, error)
 		Send(request).
 		End()
 
-	sendBody, error := json.Marshal(request)
-	log.Println(request.Attributes.KibanaSavedObjectMeta.SearchSourceJSON)
-	log.Println(string(sendBody))
-
 	if err != nil {
 		return nil, err[0]
 	}
@@ -104,7 +99,7 @@ func (api *SearchClient) Create(request *SearchRequest) (*SearchResponse, error)
 	}
 
 	createResponse := &SearchResponse{}
-	error = json.Unmarshal([]byte(body), createResponse)
+	error := json.Unmarshal([]byte(body), createResponse)
 	if error != nil {
 		return nil, fmt.Errorf("could not parse fields from create response, error: %v", error)
 	}
