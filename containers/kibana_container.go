@@ -59,7 +59,7 @@ type valuePair struct {
 	Value string `json:"value"`
 }
 
-func NewKibanaContainer(pool *dockertest.Pool, elasticSearch *elasticSearchContainer) *kibanaContainer {
+func NewKibanaContainer(pool *dockertest.Pool, elasticSearch *elasticSearchContainer) (container *kibanaContainer, indexId string) {
 	envVars := []string{
 		fmt.Sprintf("ELASTICSEARCH_URL=http://%s:9200", elasticSearch.Name),
 	}
@@ -79,29 +79,23 @@ func NewKibanaContainer(pool *dockertest.Pool, elasticSearch *elasticSearchConta
 	resource, err := pool.RunWithOptions(options)
 	kibanaUri := fmt.Sprintf("http://localhost:%v", resource.GetPort("5601/tcp"))
 
+	var indexPatternCreateResult *indexPatternCreateResult
 	if err := pool.Retry(func() error {
 		client := gorequest.New()
 
-		if error := checkKibanaServiceIsStarted(client, kibanaUri); error != nil {
+		var error error
+		if error = checkKibanaServiceIsStarted(client, kibanaUri); error != nil {
 			return error
 		}
 
-		indexPatternCreateResult, error := createIndexPattern(client, kibanaUri)
+		indexPatternCreateResult, error = createIndexPattern(client, kibanaUri)
 		if error != nil {
 			return error
 		}
 
-		//	if error := bulkGetPost(client, kibanaUri, indexPatternCreateResult); error != nil {
-		//		return error
-		//	}
-
 		if error := updateIndexPatternFields(client, kibanaUri, indexPatternCreateResult.Id); error != nil {
 			return error
 		}
-
-		//	if error := deleteDefaultIndexPattern(client, kibanaUri); error != nil{
-		//		return error
-		//	}
 
 		if error := setDefaultIndexPattern(client, kibanaUri, indexPatternCreateResult.Id); error != nil {
 			return error
@@ -124,7 +118,7 @@ func NewKibanaContainer(pool *dockertest.Pool, elasticSearch *elasticSearchConta
 		pool:     pool,
 		resource: resource,
 		Uri:      kibanaUri,
-	}
+	}, indexPatternCreateResult.Id
 }
 
 func setDefaultIndexPattern(client *gorequest.SuperAgent, kibanaUri string, indexPatternId string) error {

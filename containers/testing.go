@@ -7,11 +7,12 @@ import (
 )
 
 type TestContext struct {
-	containers []container
-	KibanaUri  string
+	containers    []container
+	KibanaUri     string
+	KibanaIndexId string
 }
 
-func StartKibana() *TestContext {
+func StartKibana() (*TestContext, error) {
 	log.SetOutput(os.Stdout)
 
 	var err error
@@ -20,9 +21,16 @@ func StartKibana() *TestContext {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	elasticSearch := NewElasticSearchContainer(pool)
-	kibana := NewKibanaContainer(pool, elasticSearch)
-	return &TestContext{containers: []container{elasticSearch, kibana}, KibanaUri: kibana.Uri}
+	elasticSearch, err := NewElasticSearchContainer(pool)
+	if err != nil {
+		return nil, err
+	}
+
+	kibana, index := NewKibanaContainer(pool, elasticSearch)
+	return &TestContext{
+		containers:    []container{elasticSearch, kibana},
+		KibanaUri:     kibana.Uri,
+		KibanaIndexId: index}, nil
 }
 
 func StopKibana(testContext *TestContext) {

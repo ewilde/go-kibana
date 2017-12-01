@@ -15,7 +15,7 @@ type elasticSearchContainer struct {
 	Uri      string
 }
 
-func NewElasticSearchContainer(pool *dockertest.Pool) *elasticSearchContainer {
+func NewElasticSearchContainer(pool *dockertest.Pool) (*elasticSearchContainer, error) {
 
 	envVars := []string{
 		"discovery.type=single-node",
@@ -30,6 +30,10 @@ func NewElasticSearchContainer(pool *dockertest.Pool) *elasticSearchContainer {
 	}
 
 	resource, err := pool.RunWithOptions(options)
+	if err != nil {
+		return nil, err
+	}
+
 	elasticSearchAddress := fmt.Sprintf("http://localhost:%v", resource.GetPort("9200/tcp"))
 
 	if err := pool.Retry(func() error {
@@ -60,7 +64,7 @@ func NewElasticSearchContainer(pool *dockertest.Pool) *elasticSearchContainer {
 		pool:     pool,
 		resource: resource,
 		Uri:      elasticSearchAddress,
-	}
+	}, nil
 }
 
 func (elasticSearch *elasticSearchContainer) Stop() error {
