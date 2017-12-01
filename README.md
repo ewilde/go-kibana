@@ -1,4 +1,4 @@
 # go-kibana
 go client library for kibana
 
-https://travis-ci.org/ewilde/go-kibana.svg?branch=master
+[![Build Status](https://travis-ci.org/ewilde/go-kibana.svg?branch=master)](https://travis-ci.org/ewilde/go-kibana)
