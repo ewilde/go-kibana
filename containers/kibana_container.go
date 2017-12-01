@@ -10,7 +10,7 @@ import (
 	"log"
 )
 
-const kibanaVersion = "6.0.0"
+const KibanaVersion = "6.0.0"
 
 type kibanaContainer struct {
 	Name     string
@@ -67,7 +67,7 @@ func NewKibanaContainer(pool *dockertest.Pool, elasticSearch *elasticSearchConta
 	options := &dockertest.RunOptions{
 		Name:         "kibana",
 		Repository:   "docker.elastic.co/kibana/kibana-oss",
-		Tag:          kibanaVersion,
+		Tag:          KibanaVersion,
 		Env:          envVars,
 		Links:        []string{elasticSearch.Name},
 		ExposedPorts: []string{"5601"},
@@ -123,24 +123,8 @@ func NewKibanaContainer(pool *dockertest.Pool, elasticSearch *elasticSearchConta
 
 func setDefaultIndexPattern(client *gorequest.SuperAgent, kibanaUri string, indexPatternId string) error {
 	response, body, err := client.Post(fmt.Sprintf("%s/api/kibana/settings/defaultIndex", kibanaUri)).
-		Set("kbn-version", kibanaVersion).
+		Set("kbn-version", KibanaVersion).
 		Send(&valuePair{Value: indexPatternId}).
-		End()
-
-	if err != nil {
-		return err[0]
-	}
-
-	if response.StatusCode >= 300 {
-		return errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
-	}
-
-	return nil
-}
-
-func deleteDefaultIndexPattern(client *gorequest.SuperAgent, kibanaUri string) error {
-	response, body, err := client.Delete(fmt.Sprintf("%s/api/kibana/settings/defaultIndex", kibanaUri)).
-		Set("kbn-version", kibanaVersion).
 		End()
 
 	if err != nil {
@@ -156,7 +140,7 @@ func deleteDefaultIndexPattern(client *gorequest.SuperAgent, kibanaUri string) e
 
 func createIndexPattern(client *gorequest.SuperAgent, kibanaUri string) (*indexPatternCreateResult, error) {
 	response, body, err := client.Post(kibanaUri+"/api/saved_objects/index-pattern").
-		Set("kbn-version", kibanaVersion).
+		Set("kbn-version", KibanaVersion).
 		Send("{\"attributes\":{\"title\":\"logstash-*\",\"timeFieldName\":\"@timestamp\"}}").End()
 
 	if err != nil {
@@ -208,7 +192,7 @@ func updateIndexPatternFields(client *gorequest.SuperAgent, kibanaUri string, in
 	}
 
 	response, body, err = client.Put(fmt.Sprintf("%s/api/saved_objects/index-pattern/%s", kibanaUri, indexPatternId)).
-		Set("kbn-version", kibanaVersion).
+		Set("kbn-version", KibanaVersion).
 		Send(indexPattern).
 		End()
 
@@ -225,7 +209,7 @@ func updateIndexPatternFields(client *gorequest.SuperAgent, kibanaUri string, in
 
 func bulkGetPost(client *gorequest.SuperAgent, kibanaUri string, indexPatternCreateResult *indexPatternCreateResult) error {
 	response, body, err := client.Post(kibanaUri+"/api/saved_objects/bulk_get").
-		Set("kbn-version", kibanaVersion).
+		Set("kbn-version", KibanaVersion).
 		Send(&[]*indexPatternBulkGet{{Id: indexPatternCreateResult.Id, Type: indexPatternCreateResult.Type}}).End()
 
 	if err != nil {

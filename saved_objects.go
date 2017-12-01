@@ -26,9 +26,9 @@ type SavedObjectsClient struct {
 }
 
 type SavedObjectResponse struct {
-	Page         int           `json:"page"`
-	PerPage      int           `json:"per_page"`
-	Total        int           `json:"total"`
+	Page         int            `json:"page"`
+	PerPage      int            `json:"per_page"`
+	Total        int            `json:"total"`
 	SavedObjects []*SavedObject `json:"saved_objects"`
 }
 

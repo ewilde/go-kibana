@@ -2,7 +2,6 @@ package kibana
 
 import (
 	"github.com/google/go-querystring/query"
-	"github.com/hashicorp/go-hclog"
 	"github.com/parnurzeal/gorequest"
 	"net/url"
 	"os"
@@ -14,8 +13,8 @@ const EnvKibanaUri = "KIBANA_URI"
 const EnvKibanaIndexId = "KIBANA_INDEX_ID"
 
 type Config struct {
-	HostAddress string
-	Logger      hclog.Logger
+	HostAddress    string
+	DefaultIndexId string
 }
 
 type KibanaClient struct {
@@ -32,6 +31,10 @@ func NewDefaultConfig() *Config {
 		config.HostAddress = strings.TrimRight(os.Getenv(EnvKibanaUri), "/")
 	}
 
+	if os.Getenv(EnvKibanaIndexId) != "" {
+		config.DefaultIndexId = os.Getenv(EnvKibanaIndexId)
+	}
+
 	return config
 }
 
@@ -42,8 +45,8 @@ func NewClient(config *Config) *KibanaClient {
 	}
 }
 
-func (kibanaClient *KibanaClient) Discover() *DiscoverClient {
-	return &DiscoverClient{
+func (kibanaClient *KibanaClient) Search() *SearchClient {
+	return &SearchClient{
 		config: kibanaClient.config,
 		client: kibanaClient.client,
 	}

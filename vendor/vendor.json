@@ -219,12 +219,6 @@
 			"revisionTime": "2017-11-23T12:57:29Z"
 		},
 		{
-			"checksumSHA1": "AA0aYmdg4pb5gPCUSXg8iPzxLag=",
-			"path": "github.com/hashicorp/go-hclog",
-			"revision": "ca137eb4b4389c9bc6f1a6d887f056bf16c00510",
-			"revisionTime": "2017-10-05T15:17:51Z"
-		},
-		{
 			"checksumSHA1": "CxNwJP++vjUAyy3bbJnNss1Il9Q=",
 			"path": "github.com/moul/http2curl",
 			"revision": "9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d",
