@@ -2,7 +2,6 @@ package examples
 
 import (
 	"github.com/ewilde/go-kibana"
-	"github.com/stretchr/testify/assert"
 )
 
 func createSearch() (*kibana.SearchResponse, error) {
