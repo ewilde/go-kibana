@@ -11,6 +11,7 @@ import (
 
 const EnvKibanaUri = "KIBANA_URI"
 const EnvKibanaIndexId = "KIBANA_INDEX_ID"
+const DefaultKibanaUri = "http://localhost:5601"
 
 type Config struct {
 	HostAddress    string
@@ -24,7 +25,7 @@ type KibanaClient struct {
 
 func NewDefaultConfig() *Config {
 	config := &Config{
-		HostAddress: "http://localhost:5601",
+		HostAddress: DefaultKibanaUri,
 	}
 
 	if os.Getenv(EnvKibanaUri) != "" {

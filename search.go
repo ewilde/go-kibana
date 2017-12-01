@@ -25,6 +25,9 @@ type SearchRequest struct {
 }
 
 type SearchResponse struct {
+	Id         string            `json:"id"`
+	Type       string            `json:"type"`
+	Version    int               `json:"version"`
 	Attributes *SearchAttributes `json:"attributes"`
 }
 
@@ -102,6 +105,29 @@ func (api *SearchClient) Create(request *SearchRequest) (*SearchResponse, error)
 	error := json.Unmarshal([]byte(body), createResponse)
 	if error != nil {
 		return nil, fmt.Errorf("could not parse fields from create response, error: %v", error)
+	}
+
+	return createResponse, nil
+}
+
+func (api *SearchClient) GetById(id string) (*SearchResponse, error) {
+	response, body, err := api.client.
+		Get(api.config.HostAddress+savedObjectsPath+"search/"+id).
+		Set("kbn-version", containers.KibanaVersion).
+		End()
+
+	if err != nil {
+		return nil, err[0]
+	}
+
+	if response.StatusCode >= 300 {
+		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
+	}
+
+	createResponse := &SearchResponse{}
+	error := json.Unmarshal([]byte(body), createResponse)
+	if error != nil {
+		return nil, fmt.Errorf("could not parse fields from get response, error: %v", error)
 	}
 
 	return createResponse, nil
