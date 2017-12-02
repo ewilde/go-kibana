@@ -111,6 +111,46 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 func Test_SearchRead(t *testing.T) {
 	client := NewClient(NewDefaultConfig())
 
+	request, requestSearch, err := createSearchRequest(client, t)
+
+	assert.Nil(t, err)
+
+	createdSearch, err := client.Search().Create(request)
+	assert.Nil(t, err, "Error creating search")
+
+	readSearch, err := client.Search().GetById(createdSearch.Id)
+	assert.Nil(t, err, "Error getting search by id")
+	assert.NotNil(t, readSearch, "Search retrieved from get by id was null.")
+
+	assert.Equal(t, request.Attributes.Title, createdSearch.Attributes.Title)
+	assert.Equal(t, request.Attributes.Columns, createdSearch.Attributes.Columns)
+	assert.Equal(t, request.Attributes.Sort, createdSearch.Attributes.Sort)
+	assert.NotEmpty(t, request.Attributes.KibanaSavedObjectMeta.SearchSourceJSON)
+
+	responseSearch := &SearchSource{}
+	json.Unmarshal([]byte(createdSearch.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
+	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
+	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
+	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Query, responseSearch.Filter[0].Query.Match["geo.src"].Query)
+	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Type, responseSearch.Filter[0].Query.Match["geo.src"].Type)
+}
+
+func Test_Delete(t *testing.T) {
+	client := NewClient(NewDefaultConfig())
+
+	request, _, err := createSearchRequest(client, t)
+	assert.Nil(t, err)
+	response, err := client.Search().Create(request)
+	assert.Nil(t, err)
+
+	err = client.Search().Delete(response.Id)
+	assert.Nil(t, err, "Delete returned error:%+v", err)
+
+	response, err = client.Search().GetById(response.Id)
+	assert.Nil(t, response, "Response should be nil after being deleted")
+}
+
+func createSearchRequest(client *KibanaClient, t *testing.T) (*SearchRequest, *SearchSource, error) {
 	requestSearch, err := NewSearchSourceBuilder().
 		WithIndexId(client.Config.DefaultIndexId).
 		WithFilter(&SearchFilter{
@@ -134,24 +174,5 @@ func Test_SearchRead(t *testing.T) {
 		WithSearchSource(requestSearch).
 		Build()
 
-	assert.Nil(t, err)
-
-	createdSearch, err := client.Search().Create(request)
-	assert.Nil(t, err, "Error creating search")
-
-	readSearch, err := client.Search().GetById(createdSearch.Id)
-	assert.Nil(t, err, "Error getting search by id")
-	assert.NotNil(t, readSearch, "Search retrieved from get by id was null.")
-
-	assert.Equal(t, request.Attributes.Title, createdSearch.Attributes.Title)
-	assert.Equal(t, request.Attributes.Columns, createdSearch.Attributes.Columns)
-	assert.Equal(t, request.Attributes.Sort, createdSearch.Attributes.Sort)
-	assert.NotEmpty(t, request.Attributes.KibanaSavedObjectMeta.SearchSourceJSON)
-
-	responseSearch := &SearchSource{}
-	json.Unmarshal([]byte(createdSearch.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
-	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
-	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
-	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Query, responseSearch.Filter[0].Query.Match["geo.src"].Query)
-	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Type, responseSearch.Filter[0].Query.Match["geo.src"].Type)
+	return request, requestSearch, err
 }
