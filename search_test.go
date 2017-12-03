@@ -135,6 +135,24 @@ func Test_SearchRead(t *testing.T) {
 	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Type, responseSearch.Filter[0].Query.Match["geo.src"].Type)
 }
 
+func Test_Update(t *testing.T) {
+	client := NewClient(NewDefaultConfig())
+
+	request, _, err := createSearchRequest(client, t)
+	assert.Nil(t, err)
+	search, err := client.Search().Create(request)
+	assert.Nil(t, err)
+	defer func() {
+		err = client.Search().Delete(search.Id)
+		assert.Nil(t, err, "Delete returned error:%+v", err)
+	}()
+
+	search.Attributes.Title = "China updated"
+	search, err = client.Search().Update(search.Id, &UpdateSearchRequest{Attributes: search.Attributes})
+	assert.Nil(t, err)
+	assert.Equal(t, "China updated", search.Attributes.Title)
+}
+
 func Test_Delete(t *testing.T) {
 	client := NewClient(NewDefaultConfig())
 
@@ -150,7 +168,7 @@ func Test_Delete(t *testing.T) {
 	assert.Nil(t, response, "Response should be nil after being deleted")
 }
 
-func createSearchRequest(client *KibanaClient, t *testing.T) (*SearchRequest, *SearchSource, error) {
+func createSearchRequest(client *KibanaClient, t *testing.T) (*CreateSearchRequest, *SearchSource, error) {
 	requestSearch, err := NewSearchSourceBuilder().
 		WithIndexId(client.Config.DefaultIndexId).
 		WithFilter(&SearchFilter{

@@ -4,7 +4,7 @@ import (
 	"github.com/ewilde/go-kibana"
 )
 
-func createSearch() (*kibana.SearchResponse, error) {
+func createSearch() (*kibana.Search, error) {
 	client := kibana.NewClient(kibana.NewDefaultConfig())
 
 	requestSearch, _ := kibana.NewSearchSourceBuilder().
