@@ -1,18 +1,23 @@
-package containers
+package kibana
 
 import (
 	"gopkg.in/ory-am/dockertest.v3"
 	"log"
 	"os"
+	"strings"
 )
 
-type TestContext struct {
+type testContext struct {
 	containers    []container
 	KibanaUri     string
 	KibanaIndexId string
 }
 
-func StartKibana() (*TestContext, error) {
+type container interface {
+	Stop() error
+}
+
+func startKibana(elkVersion string, client *KibanaClient) (*testContext, error) {
 	log.SetOutput(os.Stdout)
 
 	var err error
@@ -21,19 +26,23 @@ func StartKibana() (*TestContext, error) {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	elasticSearch, err := NewElasticSearchContainer(pool)
+	elasticSearch, err := newElasticSearchContainer(pool, elkVersion)
 	if err != nil {
 		return nil, err
 	}
 
-	kibana, index := NewKibanaContainer(pool, elasticSearch)
-	return &TestContext{
+	kibana, index, err := newKibanaContainer(pool, elasticSearch, elkVersion, client)
+	if err != nil {
+		return nil, err
+	}
+
+	return &testContext{
 		containers:    []container{elasticSearch, kibana},
 		KibanaUri:     kibana.Uri,
 		KibanaIndexId: index}, nil
 }
 
-func StopKibana(testContext *TestContext) {
+func stopKibana(testContext *testContext) {
 
 	for _, container := range testContext.containers {
 		err := container.Stop()
@@ -42,4 +51,8 @@ func StopKibana(testContext *TestContext) {
 		}
 	}
 
+}
+
+func getContainerName(container *dockertest.Resource) string {
+	return strings.TrimPrefix(container.Container.Name, "/")
 }

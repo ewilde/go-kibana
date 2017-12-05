@@ -3,7 +3,6 @@ package kibana
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/parnurzeal/gorequest"
 )
 
 const savedObjectsPath = "/api/saved_objects/"
@@ -22,7 +21,7 @@ type SavedObjectRequestBuilder struct {
 
 type SavedObjectsClient struct {
 	config *Config
-	client *gorequest.SuperAgent
+	client *HttpAgent
 }
 
 type SavedObjectResponse struct {

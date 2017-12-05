@@ -7,7 +7,7 @@ import (
 )
 
 func Test_SearchCreate(t *testing.T) {
-	client := NewClient(NewDefaultConfig())
+	client := defaultTestKibanaClient()
 
 	requestSearch, err := NewSearchSourceBuilder().
 		WithIndexId(client.Config.DefaultIndexId).
@@ -52,7 +52,7 @@ func Test_SearchCreate(t *testing.T) {
 }
 
 func Test_SearchCreate_with_two_filters(t *testing.T) {
-	client := NewClient(NewDefaultConfig())
+	client := defaultTestKibanaClient()
 
 	requestSearch, err := NewSearchSourceBuilder().
 		WithIndexId(client.Config.DefaultIndexId).
@@ -109,7 +109,7 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 }
 
 func Test_SearchRead(t *testing.T) {
-	client := NewClient(NewDefaultConfig())
+	client := defaultTestKibanaClient()
 
 	request, requestSearch, err := createSearchRequest(client, t)
 
@@ -136,7 +136,7 @@ func Test_SearchRead(t *testing.T) {
 }
 
 func Test_Update(t *testing.T) {
-	client := NewClient(NewDefaultConfig())
+	client := defaultTestKibanaClient()
 
 	request, _, err := createSearchRequest(client, t)
 	assert.Nil(t, err)
@@ -154,7 +154,7 @@ func Test_Update(t *testing.T) {
 }
 
 func Test_Delete(t *testing.T) {
-	client := NewClient(NewDefaultConfig())
+	client := defaultTestKibanaClient()
 
 	request, _, err := createSearchRequest(client, t)
 	assert.Nil(t, err)

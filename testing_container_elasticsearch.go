@@ -1,4 +1,4 @@
-package containers
+package kibana
 
 import (
 	"errors"
@@ -15,7 +15,7 @@ type elasticSearchContainer struct {
 	Uri      string
 }
 
-func NewElasticSearchContainer(pool *dockertest.Pool) (*elasticSearchContainer, error) {
+func newElasticSearchContainer(pool *dockertest.Pool, elasticSearchVersion string) (*elasticSearchContainer, error) {
 
 	envVars := []string{
 		"discovery.type=single-node",
@@ -25,7 +25,7 @@ func NewElasticSearchContainer(pool *dockertest.Pool) (*elasticSearchContainer, 
 		Name:       "elasticsearch",
 		Hostname:   "elasticsearch",
 		Repository: "elastic-local",
-		Tag:        "6.0.0",
+		Tag:        elasticSearchVersion,
 		Env:        envVars,
 	}
 
@@ -38,7 +38,7 @@ func NewElasticSearchContainer(pool *dockertest.Pool) (*elasticSearchContainer, 
 
 	if err := pool.Retry(func() error {
 		client := gorequest.New()
-		response, body, err := client.Get(elasticSearchAddress).End()
+		response, body, err := client.Get(elasticSearchAddress).SetBasicAuth("elastic", "changeme").End()
 		if err != nil {
 			return err[0]
 		}
@@ -57,7 +57,7 @@ func NewElasticSearchContainer(pool *dockertest.Pool) (*elasticSearchContainer, 
 	}
 
 	name := getContainerName(resource)
-	log.Printf("Elastic search (%v): up", name)
+	log.Printf("Elastic %s search (%v): up", elasticSearchVersion, name)
 
 	return &elasticSearchContainer{
 		Name:     name,
