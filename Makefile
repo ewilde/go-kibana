@@ -2,13 +2,15 @@
 
 TEST?=$$(go list ./... |grep -v 'vendor')
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
+$(eval REMAINDER := $$$(ELK_VERSION))
+MAIN_VERSION := $(shell echo $(ELK_VERSION) | head -c 3)
 
 default: build test
 
 build: fmtcheck errcheck vet
 	go install
 
-test: docker fmtcheck
+test: docker-build fmtcheck
 	go test -v ./...
 
 vet:
@@ -40,6 +42,12 @@ test-compile:
 	fi
 	go test -c $(TEST) $(TESTARGS)
 
-docker:
-	cd docker/elasticsearch && docker build . -t elastic-local:6.0.0
-.PHONY: build docker test testacc vet fmt fmtcheck errcheck vendor-status test-compile
+docker-build:
+	@if [ "$(ELK_VERSION)" = "./..." ]; then \
+		echo "ERROR: Set ELK_VERSION to a specific version. For example,"; \
+		echo "  make docker-build ELK_VERSION=5.5.3"; \
+		exit 1; \
+	fi
+	cd docker/elasticsearch-$(MAIN_VERSION) && docker build --build-arg ELK_VERSION=$(ELK_VERSION) . -t elastic-local:$(ELK_VERSION)
+
+.PHONY: build docker-build test testacc vet fmt fmtcheck errcheck vendor-status test-compile

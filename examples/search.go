@@ -6,6 +6,7 @@ import (
 
 func createSearch() (*kibana.Search, error) {
 	client := kibana.NewClient(kibana.NewDefaultConfig())
+	client.Config.KibanaVersion = "6.0.0"
 
 	requestSearch, _ := kibana.NewSearchSourceBuilder().
 		WithIndexId(client.Config.DefaultIndexId).
