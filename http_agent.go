@@ -1,6 +1,11 @@
 package kibana
 
-import "github.com/parnurzeal/gorequest"
+import (
+	"github.com/parnurzeal/gorequest"
+	"fmt"
+	"encoding/json"
+	"errors"
+)
 
 type HttpAgent struct {
 	client      *gorequest.SuperAgent
@@ -8,7 +13,7 @@ type HttpAgent struct {
 }
 
 type AuthenticationHandler interface {
-	Initialize(agent *gorequest.SuperAgent)
+	Initialize(agent *gorequest.SuperAgent) error
 }
 
 type NoAuthenticationHandler struct {
@@ -19,7 +24,19 @@ type BasicAuthenticationHandler struct {
 	password string
 }
 
-type LogzAuthentication struct {
+type LogzAuthenticationHandler struct {
+	Auth0Uri string
+	LogzUri string
+	UserName string
+	Password string
+	ClientId string
+	sessionToken string
+}
+
+type Auth0Response struct {
+	IdTokens  string                  `json:"id_token"`
+	AccessToken  string                  `json:"access_token"`
+	TokenType  string                  `json:"token_type"`
 }
 
 func NewHttpAgent(config *Config, authHandler AuthenticationHandler) *HttpAgent {
@@ -78,9 +95,60 @@ func NewBasicAuthentication(userName string, password string) *BasicAuthenticati
 	return &BasicAuthenticationHandler{userName: userName, password: password}
 }
 
-func (auth *BasicAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) {
+func (auth *BasicAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) error {
 	agent.SetBasicAuth(auth.userName, auth.password)
+	return nil
 }
 
-func (auth *NoAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) {
+func (auth *NoAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) error {
+	return nil
+}
+
+func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) error {
+	if auth.sessionToken != "" {
+		return nil
+	}
+
+	request := gorequest.New()
+	response, body, errs := request.Post(fmt.Sprintf("%s/oauth/ro", auth.Auth0Uri)).
+		Set("kbn-version","6.0.0").
+		Set("Content-Type","application/x-www-form-urlencoded").
+		Type("form").
+		Send(fmt.Sprintf(`{
+  "scope": "openid email connection",
+  "response_type": "code",
+  "connection": "Username-Password-Authentication",
+  "username": "%s",
+  "password": "%s",
+  "grant_type": "password",
+  "client_id": "%s"
+}`, auth.UserName, auth.Password, auth.ClientId)).
+		End()
+
+	if errs != nil {
+		return errs[0]
+	}
+
+	if response.StatusCode >= 300 {
+		return errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
+	}
+
+	authResponse := &Auth0Response{}
+	if err := json.Unmarshal([]byte(body), authResponse); err != nil {
+		return err
+	}
+
+	response, body, errs = request.Post(fmt.Sprintf("%s/login/jwt", auth.LogzUri)).
+		Send(fmt.Sprintf(`{
+  "jwt": "%s"
+}`, authResponse.IdTokens)).
+		End()
+
+	jwtResponse := map[string]interface{}{}
+	if err := json.Unmarshal([]byte(body), &jwtResponse); err != nil {
+		return err
+	}
+
+	auth.sessionToken = jwtResponse["sessionToken"].(string)
+	return nil
 }
