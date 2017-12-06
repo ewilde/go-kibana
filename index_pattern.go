@@ -9,18 +9,18 @@ import (
 var urlFromVersion = map[string]map[string]func(config *Config, name string, id string) string{
 	"6.0.0": {
 		"create_index": func(config *Config, name string, id string) string {
-			return fmt.Sprintf("%s/api/saved_objects/index-pattern", config.HostAddress)
+			return fmt.Sprintf("%s/api/saved_objects/index-pattern", config.KibanaBaseUri)
 		},
 		"refresh_index": func(config *Config, name string, id string) string {
-			return fmt.Sprintf("%s/api/saved_objects/index-pattern/%s", config.HostAddress, id)
+			return fmt.Sprintf("%s/api/saved_objects/index-pattern/%s", config.KibanaBaseUri, id)
 		},
 	},
 	"5.5.3": {
 		"create_index": func(config *Config, name string, id string) string {
-			return fmt.Sprintf("%s/es_admin/.kibana/index-pattern/%s/_create", config.HostAddress, name)
+			return fmt.Sprintf("%s/es_admin/.kibana/index-pattern/%s/_create", config.KibanaBaseUri, name)
 		},
 		"refresh_index": func(config *Config, name string, id string) string {
-			return fmt.Sprintf("%s/es_admin/.kibana/index-pattern/%s", config.HostAddress, name)
+			return fmt.Sprintf("%s/es_admin/.kibana/index-pattern/%s", config.KibanaBaseUri, name)
 		},
 	},
 }
@@ -83,7 +83,7 @@ type valuePair struct {
 }
 
 func (api *IndexPatternClient600) SetDefault(indexPatternId string) error {
-	response, body, err := api.client.Post(fmt.Sprintf("%s/api/kibana/settings/defaultIndex", api.config.HostAddress)).
+	response, body, err := api.client.Post(fmt.Sprintf("%s/api/kibana/settings/defaultIndex", api.config.KibanaBaseUri)).
 		Set("kbn-version", api.config.KibanaVersion).
 		Send(&valuePair{Value: indexPatternId}).
 		End()
@@ -123,7 +123,7 @@ func (api *IndexPatternClient600) Create() (*IndexPatternCreateResult, error) {
 }
 
 func (api *IndexPatternClient600) RefreshFields(indexPatternId string) error {
-	response, body, errs := api.client.Get(api.config.HostAddress + "/api/index_patterns/_fields_for_wildcard").
+	response, body, errs := api.client.Get(api.config.KibanaBaseUri + "/api/index_patterns/_fields_for_wildcard").
 		Query(`{ "pattern" : "logstash-*", "meta_fields" : "[\"_source\",\"_id\",\"_type\",\"_index\",\"_score\"]" }`).End()
 
 	if errs != nil {
@@ -171,7 +171,7 @@ func (api *IndexPatternClient600) RefreshFields(indexPatternId string) error {
 }
 
 func (api *IndexPatternClient553) SetDefault(indexPatternId string) error {
-	response, body, err := api.client.Post(fmt.Sprintf("%s/api/kibana/settings/defaultIndex", api.config.HostAddress)).
+	response, body, err := api.client.Post(fmt.Sprintf("%s/api/kibana/settings/defaultIndex", api.config.KibanaBaseUri)).
 		Set("kbn-version", api.config.KibanaVersion).
 		Send(&valuePair{Value: indexPatternId}).
 		End()
@@ -223,7 +223,7 @@ func (api *IndexPatternClient553) Create() (*IndexPatternCreateResult, error) {
 }
 
 func (api *IndexPatternClient553) RefreshFields(indexPatternId string) error {
-	response, body, errs := api.client.Get(api.config.HostAddress + "/api/index_patterns/_fields_for_wildcard").
+	response, body, errs := api.client.Get(api.config.KibanaBaseUri + "/api/index_patterns/_fields_for_wildcard").
 		Query(`{ "pattern" : "logstash-*", "meta_fields" : "[\"_source\",\"_id\",\"_type\",\"_index\",\"_score\"]" }`).End()
 
 	if errs != nil {

@@ -18,7 +18,7 @@ func Test_NewClient(t *testing.T) {
 	kibanaClient := defaultTestKibanaClient()
 
 	assert.NotNil(t, kibanaClient)
-	assert.Equal(t, os.Getenv(EnvKibanaUri), kibanaClient.Config.HostAddress)
+	assert.Equal(t, os.Getenv(EnvKibanaUri), kibanaClient.Config.KibanaBaseUri)
 }
 
 func TestMain(m *testing.M) {

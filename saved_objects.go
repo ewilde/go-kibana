@@ -3,6 +3,7 @@ package kibana
 import (
 	"encoding/json"
 	"fmt"
+	"errors"
 )
 
 const savedObjectsPath = "/api/saved_objects/"
@@ -39,21 +40,26 @@ type SavedObject struct {
 }
 
 func (api *SavedObjectsClient) GetByType(request *SavedObjectRequest) (*SavedObjectResponse, error) {
-	address, err := addQueryString(api.config.HostAddress+savedObjectsPath, request)
+	address, err := addQueryString(api.config.KibanaBaseUri+savedObjectsPath, request)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not build query string for get saved objects by type, error: %v", err)
 	}
 
-	_, body, errs := api.client.Get(address).End()
+	apiResponse, body, errs := api.client.Get(address).End()
 	if errs != nil {
 		return nil, fmt.Errorf("could not get saved objects, error: %v", errs)
 	}
 
+	if apiResponse.StatusCode >= 300 {
+		return nil, errors.New(fmt.Sprintf("Status: %d, %s", apiResponse.StatusCode, body))
+	}
+
+
 	response := &SavedObjectResponse{}
 	err = json.Unmarshal([]byte(body), response)
 	if err != nil {
-		return nil, fmt.Errorf("could not parse saved objects response, error: %v", err)
+		return nil, fmt.Errorf("could not parse saved objects response, error: %v, response body: %s", err, apiResponse)
 	}
 
 	return response, nil

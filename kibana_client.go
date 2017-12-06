@@ -15,7 +15,7 @@ const DefaultKibanaUri = "http://localhost:5601"
 const DefaultKibanaVersion = "6.0.0"
 
 type Config struct {
-	HostAddress    string
+	KibanaBaseUri  string
 	DefaultIndexId string
 	KibanaVersion  string
 }
@@ -45,12 +45,12 @@ var seachClientFromVersion = map[string]func(kibanaClient *KibanaClient) SearchC
 
 func NewDefaultConfig() *Config {
 	config := &Config{
-		HostAddress:   DefaultKibanaUri,
+		KibanaBaseUri: DefaultKibanaUri,
 		KibanaVersion: DefaultKibanaVersion,
 	}
 
 	if os.Getenv(EnvKibanaUri) != "" {
-		config.HostAddress = strings.TrimRight(os.Getenv(EnvKibanaUri), "/")
+		config.KibanaBaseUri = strings.TrimRight(os.Getenv(EnvKibanaUri), "/")
 	}
 
 	if os.Getenv(EnvKibanaVersion) != "" {

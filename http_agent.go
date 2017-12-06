@@ -106,6 +106,7 @@ func (auth *NoAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) err
 
 func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) error {
 	if auth.sessionToken != "" {
+		auth.setLogzHeaders(agent)
 		return nil
 	}
 
@@ -150,5 +151,13 @@ func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) e
 	}
 
 	auth.sessionToken = jwtResponse["sessionToken"].(string)
+	auth.setLogzHeaders(agent)
 	return nil
+}
+
+func (auth *LogzAuthenticationHandler) setLogzHeaders(agent *gorequest.SuperAgent) *gorequest.SuperAgent {
+	return agent.
+		Set("Content-Type", "application/json").
+		Set("x-auth-token", auth.sessionToken)
+
 }
