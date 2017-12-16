@@ -2,8 +2,8 @@ package kibana
 
 import (
 	"encoding/json"
-	"fmt"
 	"errors"
+	"fmt"
 )
 
 const savedObjectsPath = "/api/saved_objects/"
@@ -55,11 +55,10 @@ func (api *SavedObjectsClient) GetByType(request *SavedObjectRequest) (*SavedObj
 		return nil, errors.New(fmt.Sprintf("Status: %d, %s", apiResponse.StatusCode, body))
 	}
 
-
 	response := &SavedObjectResponse{}
 	err = json.Unmarshal([]byte(body), response)
 	if err != nil {
-		return nil, fmt.Errorf("could not parse saved objects response, error: %v, response body: %s", err, apiResponse)
+		return nil, fmt.Errorf("could not parse saved objects response, error: %v, response body: %s", err, body)
 	}
 
 	return response, nil

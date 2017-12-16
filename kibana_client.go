@@ -12,12 +12,22 @@ const EnvKibanaUri = "KIBANA_URI"
 const EnvKibanaVersion = "ELK_VERSION"
 const EnvKibanaIndexId = "KIBANA_INDEX_ID"
 const DefaultKibanaUri = "http://localhost:5601"
-const DefaultKibanaVersion = "6.0.0"
+const DefaultKibanaLogzioUri = "https://app-eu.logz.io/kibana/elasticsearch/logzioCustomerKibanaIndex"
+const DefaultKibanaVersion6 = "6.0.0"
+const DefaultKibanaVersionLogzio = DefaultKibanaVersion553
+const DefaultKibanaVersion553 = "5.5.3"
+const DefaultKibanaVersion = DefaultKibanaVersion6
+
+const (
+	KibanaTypeVanilla = iota
+	KibanaTypeLogzio
+)
 
 type Config struct {
-	KibanaBaseUri  string
 	DefaultIndexId string
+	KibanaBaseUri  string
 	KibanaVersion  string
+	KibanaType     int
 }
 
 type KibanaClient struct {
@@ -47,6 +57,7 @@ func NewDefaultConfig() *Config {
 	config := &Config{
 		KibanaBaseUri: DefaultKibanaUri,
 		KibanaVersion: DefaultKibanaVersion,
+		KibanaType:    KibanaTypeVanilla,
 	}
 
 	if os.Getenv(EnvKibanaUri) != "" {
@@ -59,6 +70,17 @@ func NewDefaultConfig() *Config {
 
 	if os.Getenv(EnvKibanaIndexId) != "" {
 		config.DefaultIndexId = os.Getenv(EnvKibanaIndexId)
+	}
+
+	return config
+}
+
+func NewLogzioConfig() *Config {
+	config := &Config{
+		KibanaBaseUri:  DefaultKibanaLogzioUri,
+		KibanaVersion:  DefaultKibanaVersionLogzio,
+		KibanaType:     KibanaTypeLogzio,
+		DefaultIndexId: "[logzioCustomerIndex]YYMMDD",
 	}
 
 	return config
@@ -97,7 +119,7 @@ func addQueryString(currentUrl string, filter interface{}) (string, error) {
 		return currentUrl, nil
 	}
 
-	url, err := url.Parse(currentUrl)
+	uri, err := url.Parse(currentUrl)
 	if err != nil {
 		return currentUrl, err
 	}
@@ -107,6 +129,6 @@ func addQueryString(currentUrl string, filter interface{}) (string, error) {
 		return currentUrl, err
 	}
 
-	url.RawQuery = queryStringValues.Encode()
-	return url.String(), nil
+	uri.RawQuery = queryStringValues.Encode()
+	return uri.String(), nil
 }

@@ -1,10 +1,10 @@
 package kibana
 
 import (
-	"os"
-	"testing"
 	"github.com/parnurzeal/gorequest"
 	"github.com/stretchr/testify/assert"
+	"os"
+	"testing"
 )
 
 func Test_LogzAuthentication_handler(t *testing.T) {
@@ -15,26 +15,6 @@ func Test_LogzAuthentication_handler(t *testing.T) {
 	handler.Initialize(gorequest.New())
 
 	assert.NotEmpty(t, handler.sessionToken, "Session token should not be empty")
-}
-
-func Test_LogzAuthentication_saved_objects(t *testing.T) {
-	testPreCheckForLogz(t)
-
-	client := NewClient(NewDefaultConfig())
-	client.Config.KibanaBaseUri = "https://app-eu.logz.io/kibana/elasticsearch/logzioCustomerKibanaIndex"
-	client.SetAuth(createLogzAuthenticationHandler())
-	client.client.client.Debug = true
-
-	result, err := client.SavedObjects().GetByType(
-		NewSavedObjectRequestBuilder().
-			WithFields([]string{"title"}).
-			WithType("index-pattern").
-			WithPerPage(15).
-			Build())
-
-	assert.Nil(t, err, "Error returned from KibanaClient.SavedObjects()")
-
-	assert.NotZero(t, len(result.SavedObjects), "No index patterns returned")
 }
 
 func createLogzAuthenticationHandler() *LogzAuthenticationHandler {

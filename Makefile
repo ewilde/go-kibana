@@ -45,9 +45,9 @@ test-compile:
 docker-build:
 	@if [ "$(ELK_VERSION)" = "./..." ]; then \
 		echo "ERROR: Set ELK_VERSION to a specific version. For example,"; \
-		echo "  make docker-build ELK_VERSION=5.5.3"; \
+		echo "  make docker-build"; \
 		exit 1; \
 	fi
-	cd docker/elasticsearch-$(MAIN_VERSION) && docker build --build-arg ELK_VERSION=$(ELK_VERSION) . -t elastic-local:$(ELK_VERSION)
+	cd docker/elasticsearch-$(MAIN_VERSION) && docker build . -t elastic-local:$(ELK_VERSION)
 
 .PHONY: build docker-build test testacc vet fmt fmtcheck errcheck vendor-status test-compile

@@ -51,6 +51,43 @@ func Test_SearchCreate(t *testing.T) {
 	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Type, responseSearch.Filter[0].Query.Match["geo.src"].Type)
 }
 
+func Test_SearchCreateLogzio(t *testing.T) {
+	testPreCheckForLogz(t)
+
+	client := NewClient(NewLogzioConfig())
+	client.SetAuth(createLogzAuthenticationHandler())
+
+	requestSearch, err := NewSearchSourceBuilder().
+		WithIndexId(client.Config.DefaultIndexId).
+		WithFilter(&SearchFilter{
+			Query: &SearchFilterQuery{
+				Match: map[string]*SearchFilterQueryAttributes{
+					"geo.src": {
+						Query: "CN",
+						Type:  "phrase",
+					},
+				},
+			},
+		}).
+		Build()
+
+	assert.Nil(t, err)
+
+	request, err := NewRequestBuilder().
+		WithTitle("Geography filter on china").
+		WithDisplayColumns([]string{"_source"}).
+		WithSortColumns([]string{"@timestamp"}, Descending).
+		WithSearchSource(requestSearch).
+		Build()
+
+	searchApi := client.Search()
+	response, err := searchApi.Create(request)
+	defer searchApi.Delete(response.Id)
+
+	assert.Nil(t, err, "Error creating a search using logz.io")
+	assert.NotNil(t, response)
+}
+
 func Test_SearchCreate_with_two_filters(t *testing.T) {
 	client := defaultTestKibanaClient()
 
