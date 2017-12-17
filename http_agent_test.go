@@ -1,13 +1,13 @@
 package kibana
 
 import (
-	"os"
-	"testing"
 	"github.com/parnurzeal/gorequest"
 	"github.com/stretchr/testify/assert"
+	"os"
+	"testing"
 )
 
-func Test_LogzAuthentication(t *testing.T) {
+func Test_LogzAuthentication_handler(t *testing.T) {
 	testPreCheckForLogz(t)
 
 	handler := createLogzAuthenticationHandler()

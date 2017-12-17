@@ -11,13 +11,42 @@ import (
 const EnvKibanaUri = "KIBANA_URI"
 const EnvKibanaVersion = "ELK_VERSION"
 const EnvKibanaIndexId = "KIBANA_INDEX_ID"
+const EnvKibanaType = "KIBANA_TYPE"
 const DefaultKibanaUri = "http://localhost:5601"
-const DefaultKibanaVersion = "6.0.0"
+const DefaultKibanaVersion6 = "6.0.0"
+const DefaultKibanaVersion553 = "5.5.3"
+const DefaultKibanaVersion = DefaultKibanaVersion6
+const DefaultKibanaIndexId = "logstash-*"
+const DefaultKibanaIndexIdLogzio = "[logzioCustomerIndex]YYMMDD"
+
+type KibanaType int
+
+var kibanaTypeNames = map[string]KibanaType{
+	KibanaTypeVanilla.String(): KibanaTypeVanilla,
+	KibanaTypeLogzio.String():  KibanaTypeLogzio,
+}
+
+const (
+	KibanaTypeUnknown KibanaType = iota
+	KibanaTypeVanilla
+	KibanaTypeLogzio
+)
+
+func parseKibanaType(value string) KibanaType {
+	kibanaType, ok := kibanaTypeNames[value]
+
+	if !ok {
+		return KibanaTypeUnknown
+	}
+
+	return kibanaType
+}
 
 type Config struct {
-	HostAddress    string
 	DefaultIndexId string
+	KibanaBaseUri  string
 	KibanaVersion  string
+	KibanaType     KibanaType
 }
 
 type KibanaClient struct {
@@ -43,22 +72,42 @@ var seachClientFromVersion = map[string]func(kibanaClient *KibanaClient) SearchC
 	},
 }
 
+var savedObjectsClientFromVersion = map[string]func(kibanaClient *KibanaClient) SavedObjectsClient{
+	"6.0.0": func(kibanaClient *KibanaClient) SavedObjectsClient {
+		return &savedObjectsClient600{config: kibanaClient.Config, client: kibanaClient.client}
+	},
+	"5.5.3": func(kibanaClient *KibanaClient) SavedObjectsClient {
+		return &savedObjectsClient553{config: kibanaClient.Config, client: kibanaClient.client}
+	},
+}
+
 func NewDefaultConfig() *Config {
 	config := &Config{
-		HostAddress:   DefaultKibanaUri,
+		KibanaBaseUri: DefaultKibanaUri,
 		KibanaVersion: DefaultKibanaVersion,
+		KibanaType:    KibanaTypeVanilla,
 	}
 
-	if os.Getenv(EnvKibanaUri) != "" {
-		config.HostAddress = strings.TrimRight(os.Getenv(EnvKibanaUri), "/")
+	if value := os.Getenv(EnvKibanaUri); value != "" {
+		config.KibanaBaseUri = strings.TrimRight(value, "/")
 	}
 
-	if os.Getenv(EnvKibanaVersion) != "" {
-		config.KibanaVersion = os.Getenv(EnvKibanaVersion)
+	if value := os.Getenv(EnvKibanaVersion); value != "" {
+		config.KibanaVersion = value
 	}
 
-	if os.Getenv(EnvKibanaIndexId) != "" {
-		config.DefaultIndexId = os.Getenv(EnvKibanaIndexId)
+	if value := os.Getenv(EnvKibanaType); value != "" {
+		config.KibanaType = parseKibanaType(value)
+	}
+
+	if value := os.Getenv(EnvKibanaIndexId); value != "" {
+		config.DefaultIndexId = value
+	} else {
+		if config.KibanaType == KibanaTypeVanilla {
+			config.DefaultIndexId = DefaultKibanaIndexId
+		} else {
+			config.DefaultIndexId = DefaultKibanaIndexIdLogzio
+		}
 	}
 
 	return config
@@ -84,11 +133,8 @@ func (kibanaClient *KibanaClient) IndexPattern() IndexPatternClient {
 	return indexClientFromVersion[kibanaClient.Config.KibanaVersion](kibanaClient)
 }
 
-func (kibanaClient *KibanaClient) SavedObjects() *SavedObjectsClient {
-	return &SavedObjectsClient{
-		config: kibanaClient.Config,
-		client: kibanaClient.client,
-	}
+func (kibanaClient *KibanaClient) SavedObjects() SavedObjectsClient {
+	return savedObjectsClientFromVersion[kibanaClient.Config.KibanaVersion](kibanaClient)
 }
 
 func addQueryString(currentUrl string, filter interface{}) (string, error) {
@@ -97,7 +143,7 @@ func addQueryString(currentUrl string, filter interface{}) (string, error) {
 		return currentUrl, nil
 	}
 
-	url, err := url.Parse(currentUrl)
+	uri, err := url.Parse(currentUrl)
 	if err != nil {
 		return currentUrl, err
 	}
@@ -107,6 +153,6 @@ func addQueryString(currentUrl string, filter interface{}) (string, error) {
 		return currentUrl, err
 	}
 
-	url.RawQuery = queryStringValues.Encode()
-	return url.String(), nil
+	uri.RawQuery = queryStringValues.Encode()
+	return uri.String(), nil
 }

@@ -1,10 +1,10 @@
 package kibana
 
 import (
-	"github.com/parnurzeal/gorequest"
-	"fmt"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"github.com/parnurzeal/gorequest"
 )
 
 type HttpAgent struct {
@@ -25,18 +25,18 @@ type BasicAuthenticationHandler struct {
 }
 
 type LogzAuthenticationHandler struct {
-	Auth0Uri string
-	LogzUri string
-	UserName string
-	Password string
-	ClientId string
+	Auth0Uri     string
+	LogzUri      string
+	UserName     string
+	Password     string
+	ClientId     string
 	sessionToken string
 }
 
 type Auth0Response struct {
-	IdTokens  string                  `json:"id_token"`
-	AccessToken  string                  `json:"access_token"`
-	TokenType  string                  `json:"token_type"`
+	IdTokens    string `json:"id_token"`
+	AccessToken string `json:"access_token"`
+	TokenType   string `json:"token_type"`
 }
 
 func NewHttpAgent(config *Config, authHandler AuthenticationHandler) *HttpAgent {
@@ -87,7 +87,10 @@ func (authClient *HttpAgent) Send(content interface{}) *HttpAgent {
 }
 
 func (authClient *HttpAgent) End(callback ...func(response gorequest.Response, body string, errs []error)) (gorequest.Response, string, []error) {
-	authClient.authHandler.Initialize(authClient.client)
+	if err := authClient.authHandler.Initialize(authClient.client); err != nil {
+		return nil, "", []error{err}
+	}
+
 	return authClient.client.End(callback...)
 }
 
@@ -106,13 +109,14 @@ func (auth *NoAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) err
 
 func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) error {
 	if auth.sessionToken != "" {
+		auth.setLogzHeaders(agent)
 		return nil
 	}
 
 	request := gorequest.New()
 	response, body, errs := request.Post(fmt.Sprintf("%s/oauth/ro", auth.Auth0Uri)).
-		Set("kbn-version","6.0.0").
-		Set("Content-Type","application/x-www-form-urlencoded").
+		Set("kbn-version", DefaultKibanaVersion553).
+		Set("Content-Type", "application/x-www-form-urlencoded").
 		Type("form").
 		Send(fmt.Sprintf(`{
   "scope": "openid email connection",
@@ -150,5 +154,13 @@ func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) e
 	}
 
 	auth.sessionToken = jwtResponse["sessionToken"].(string)
+	auth.setLogzHeaders(agent)
 	return nil
+}
+
+func (auth *LogzAuthenticationHandler) setLogzHeaders(agent *gorequest.SuperAgent) *gorequest.SuperAgent {
+	return agent.
+		Set("Content-Type", "application/json").
+		Set("x-auth-token", auth.sessionToken)
+
 }
