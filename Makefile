@@ -50,4 +50,6 @@ docker-build:
 	fi
 	cd docker/elasticsearch-$(MAIN_VERSION) && docker build . -t elastic-local:$(ELK_VERSION)
 
-.PHONY: build docker-build test testacc vet fmt fmtcheck errcheck vendor-status test-compile
+kibana-start: docker-build
+	@sh -c "'$(CURDIR)/scripts/start-kibana-$(ELK_VERSION).sh'"
+.PHONY: build docker-build kibana-start test testacc vet fmt fmtcheck errcheck vendor-status test-compile

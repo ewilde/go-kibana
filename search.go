@@ -193,7 +193,7 @@ func (api *SearchClient600) Delete(id string) error {
 func (api *SearchClient553) Create(request *CreateSearchRequest) (*Search, error) {
 	id := uuid.NewV4().String()
 	response, body, errs := api.client.
-		Post(api.config.KibanaBaseUri+api.getUriBase("search")+id).
+		Post(fmt.Sprintf("%s/%s/%s", api.config.KibanaBaseUri, api.getUriBase("search"), id)).
 		Set("kbn-version", api.config.KibanaVersion).
 		Send(request.Attributes).
 		End()
@@ -285,15 +285,12 @@ func (api *SearchClient553) Delete(id string) error {
 	return nil
 }
 
-var uriBaseMap = map[string]map[int]string{
-	"search": {
-		KibanaTypeVanilla: "/es_admin/.kibana/search/",
-		KibanaTypeLogzio:  "/search/",
-	},
-}
-
 func (api *SearchClient553) getUriBase(action string) string {
-	return uriBaseMap[action][api.config.KibanaType]
+	if api.config.KibanaType == KibanaTypeLogzio {
+		return action
+	}
+
+	return fmt.Sprintf("es_admin/.kibana/%s", action)
 }
 
 func NewSearchSourceBuilder() *SearchSourceBuilder {

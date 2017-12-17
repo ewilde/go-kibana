@@ -5,12 +5,14 @@ import (
 	"net/url"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
 )
 
 const EnvKibanaUri = "KIBANA_URI"
 const EnvKibanaVersion = "ELK_VERSION"
 const EnvKibanaIndexId = "KIBANA_INDEX_ID"
+const EnvKibanaType = "KIBANA_TYPE"
 const DefaultKibanaUri = "http://localhost:5601"
 const DefaultKibanaLogzioUri = "https://app-eu.logz.io/kibana/elasticsearch/logzioCustomerKibanaIndex"
 const DefaultKibanaVersion6 = "6.0.0"
@@ -19,7 +21,7 @@ const DefaultKibanaVersion553 = "5.5.3"
 const DefaultKibanaVersion = DefaultKibanaVersion6
 
 const (
-	KibanaTypeVanilla = iota
+	KibanaTypeVanilla = iota + 1
 	KibanaTypeLogzio
 )
 
@@ -53,6 +55,15 @@ var seachClientFromVersion = map[string]func(kibanaClient *KibanaClient) SearchC
 	},
 }
 
+var savedObjectsClientFromVersion = map[string]func(kibanaClient *KibanaClient) SavedObjectsClient{
+	"6.0.0": func(kibanaClient *KibanaClient) SavedObjectsClient {
+		return &savedObjectsClient600{config: kibanaClient.Config, client: kibanaClient.client}
+	},
+	"5.5.3": func(kibanaClient *KibanaClient) SavedObjectsClient {
+		return &savedObjectsClient553{config: kibanaClient.Config, client: kibanaClient.client}
+	},
+}
+
 func NewDefaultConfig() *Config {
 	config := &Config{
 		KibanaBaseUri: DefaultKibanaUri,
@@ -70,6 +81,13 @@ func NewDefaultConfig() *Config {
 
 	if os.Getenv(EnvKibanaIndexId) != "" {
 		config.DefaultIndexId = os.Getenv(EnvKibanaIndexId)
+	}
+
+	if os.Getenv(EnvKibanaType) != "" {
+		result, err := strconv.ParseInt(os.Getenv(EnvKibanaType), 10, 32)
+		if err == nil {
+			config.KibanaType = int(result)
+		}
 	}
 
 	return config
@@ -106,11 +124,8 @@ func (kibanaClient *KibanaClient) IndexPattern() IndexPatternClient {
 	return indexClientFromVersion[kibanaClient.Config.KibanaVersion](kibanaClient)
 }
 
-func (kibanaClient *KibanaClient) SavedObjects() *SavedObjectsClient {
-	return &SavedObjectsClient{
-		config: kibanaClient.Config,
-		client: kibanaClient.client,
-	}
+func (kibanaClient *KibanaClient) SavedObjects() SavedObjectsClient {
+	return savedObjectsClientFromVersion[kibanaClient.Config.KibanaVersion](kibanaClient)
 }
 
 func addQueryString(currentUrl string, filter interface{}) (string, error) {
