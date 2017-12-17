@@ -32,7 +32,7 @@ const (
 	KibanaTypeLogzio
 )
 
-func parseKibanaType(value string) KibanaType {
+func ParseKibanaType(value string) KibanaType {
 	kibanaType, ok := kibanaTypeNames[value]
 
 	if !ok {
@@ -97,7 +97,7 @@ func NewDefaultConfig() *Config {
 	}
 
 	if value := os.Getenv(EnvKibanaType); value != "" {
-		config.KibanaType = parseKibanaType(value)
+		config.KibanaType = ParseKibanaType(value)
 	}
 
 	if value := os.Getenv(EnvKibanaIndexId); value != "" {
