@@ -34,7 +34,9 @@ func Test_SearchCreate(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	response, err := client.Search().Create(request)
+	searchApi := client.Search()
+	response, err := searchApi.Create(request)
+	defer searchApi.Delete(response.Id)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
@@ -49,43 +51,6 @@ func Test_SearchCreate(t *testing.T) {
 	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
 	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Query, responseSearch.Filter[0].Query.Match["geo.src"].Query)
 	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Type, responseSearch.Filter[0].Query.Match["geo.src"].Type)
-}
-
-func Test_SearchCreateLogzio(t *testing.T) {
-	testPreCheckForLogz(t)
-
-	client := NewClient(NewLogzioConfig())
-	client.SetAuth(createLogzAuthenticationHandler())
-
-	requestSearch, err := NewSearchSourceBuilder().
-		WithIndexId(client.Config.DefaultIndexId).
-		WithFilter(&SearchFilter{
-			Query: &SearchFilterQuery{
-				Match: map[string]*SearchFilterQueryAttributes{
-					"geo.src": {
-						Query: "CN",
-						Type:  "phrase",
-					},
-				},
-			},
-		}).
-		Build()
-
-	assert.Nil(t, err)
-
-	request, err := NewRequestBuilder().
-		WithTitle("Geography filter on china").
-		WithDisplayColumns([]string{"_source"}).
-		WithSortColumns([]string{"@timestamp"}, Descending).
-		WithSearchSource(requestSearch).
-		Build()
-
-	searchApi := client.Search()
-	response, err := searchApi.Create(request)
-	defer searchApi.Delete(response.Id)
-
-	assert.Nil(t, err, "Error creating a search using logz.io")
-	assert.NotNil(t, response)
 }
 
 func Test_SearchCreate_with_two_filters(t *testing.T) {
@@ -126,7 +91,9 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	response, err := client.Search().Create(request)
+	searchApi := client.Search()
+	response, err := searchApi.Create(request)
+	defer searchApi.Delete(response.Id)
 
 	assert.Nil(t, err)
 	assert.NotNil(t, response)
@@ -152,10 +119,13 @@ func Test_SearchRead(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	createdSearch, err := client.Search().Create(request)
+	searchClient := client.Search()
+	createdSearch, err := searchClient.Create(request)
+	defer searchClient.Delete(createdSearch.Id)
 	assert.Nil(t, err, "Error creating search")
 
-	readSearch, err := client.Search().GetById(createdSearch.Id)
+	readSearch, err := searchClient.GetById(createdSearch.Id)
+
 	assert.Nil(t, err, "Error getting search by id")
 	assert.NotNil(t, readSearch, "Search retrieved from get by id was null.")
 
@@ -177,15 +147,16 @@ func Test_Update(t *testing.T) {
 
 	request, _, err := createSearchRequest(client, t)
 	assert.Nil(t, err)
-	search, err := client.Search().Create(request)
+	searchClient := client.Search()
+	search, err := searchClient.Create(request)
 	assert.Nil(t, err)
 	defer func() {
-		err = client.Search().Delete(search.Id)
+		err = searchClient.Delete(search.Id)
 		assert.Nil(t, err, "Delete returned error:%+v", err)
 	}()
 
 	search.Attributes.Title = "China updated"
-	search, err = client.Search().Update(search.Id, &UpdateSearchRequest{Attributes: search.Attributes})
+	search, err = searchClient.Update(search.Id, &UpdateSearchRequest{Attributes: search.Attributes})
 	assert.Nil(t, err)
 	assert.Equal(t, "China updated", search.Attributes.Title)
 }

@@ -5,7 +5,6 @@ import (
 	"net/url"
 	"os"
 	"reflect"
-	"strconv"
 	"strings"
 )
 
@@ -14,22 +13,40 @@ const EnvKibanaVersion = "ELK_VERSION"
 const EnvKibanaIndexId = "KIBANA_INDEX_ID"
 const EnvKibanaType = "KIBANA_TYPE"
 const DefaultKibanaUri = "http://localhost:5601"
-const DefaultKibanaLogzioUri = "https://app-eu.logz.io/kibana/elasticsearch/logzioCustomerKibanaIndex"
 const DefaultKibanaVersion6 = "6.0.0"
-const DefaultKibanaVersionLogzio = DefaultKibanaVersion553
 const DefaultKibanaVersion553 = "5.5.3"
 const DefaultKibanaVersion = DefaultKibanaVersion6
+const DefaultKibanaIndexId = "logstash-*"
+const DefaultKibanaIndexIdLogzio = "[logzioCustomerIndex]YYMMDD"
+
+type KibanaType int
+
+var kibanaTypeNames = map[string]KibanaType{
+	KibanaTypeVanilla.String(): KibanaTypeVanilla,
+	KibanaTypeLogzio.String():  KibanaTypeLogzio,
+}
 
 const (
-	KibanaTypeVanilla = iota + 1
+	KibanaTypeUnknown KibanaType = iota
+	KibanaTypeVanilla
 	KibanaTypeLogzio
 )
+
+func parseKibanaType(value string) KibanaType {
+	kibanaType, ok := kibanaTypeNames[value]
+
+	if !ok {
+		return KibanaTypeUnknown
+	}
+
+	return kibanaType
+}
 
 type Config struct {
 	DefaultIndexId string
 	KibanaBaseUri  string
 	KibanaVersion  string
-	KibanaType     int
+	KibanaType     KibanaType
 }
 
 type KibanaClient struct {
@@ -71,34 +88,26 @@ func NewDefaultConfig() *Config {
 		KibanaType:    KibanaTypeVanilla,
 	}
 
-	if os.Getenv(EnvKibanaUri) != "" {
-		config.KibanaBaseUri = strings.TrimRight(os.Getenv(EnvKibanaUri), "/")
+	if value := os.Getenv(EnvKibanaUri); value != "" {
+		config.KibanaBaseUri = strings.TrimRight(value, "/")
 	}
 
-	if os.Getenv(EnvKibanaVersion) != "" {
-		config.KibanaVersion = os.Getenv(EnvKibanaVersion)
+	if value := os.Getenv(EnvKibanaVersion); value != "" {
+		config.KibanaVersion = value
 	}
 
-	if os.Getenv(EnvKibanaIndexId) != "" {
-		config.DefaultIndexId = os.Getenv(EnvKibanaIndexId)
+	if value := os.Getenv(EnvKibanaType); value != "" {
+		config.KibanaType = parseKibanaType(value)
 	}
 
-	if os.Getenv(EnvKibanaType) != "" {
-		result, err := strconv.ParseInt(os.Getenv(EnvKibanaType), 10, 32)
-		if err == nil {
-			config.KibanaType = int(result)
+	if value := os.Getenv(EnvKibanaIndexId); value != "" {
+		config.DefaultIndexId = value
+	} else {
+		if config.KibanaType == KibanaTypeVanilla {
+			config.DefaultIndexId = DefaultKibanaIndexId
+		} else {
+			config.DefaultIndexId = DefaultKibanaIndexIdLogzio
 		}
-	}
-
-	return config
-}
-
-func NewLogzioConfig() *Config {
-	config := &Config{
-		KibanaBaseUri:  DefaultKibanaLogzioUri,
-		KibanaVersion:  DefaultKibanaVersionLogzio,
-		KibanaType:     KibanaTypeLogzio,
-		DefaultIndexId: "[logzioCustomerIndex]YYMMDD",
 	}
 
 	return config

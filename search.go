@@ -222,7 +222,7 @@ func (api *SearchClient553) Create(request *CreateSearchRequest) (*Search, error
 
 func (api *SearchClient553) Update(id string, request *UpdateSearchRequest) (*Search, error) {
 	response, body, err := api.client.
-		Post(api.config.KibanaBaseUri+"/es_admin/.kibana/search/"+id).
+		Post(fmt.Sprintf("%s/%s/%s", api.config.KibanaBaseUri, api.getUriBase("search"), id)).
 		Set("kbn-version", api.config.KibanaVersion).
 		Send(request.Attributes).
 		End()
@@ -251,7 +251,7 @@ func (api *SearchClient553) Update(id string, request *UpdateSearchRequest) (*Se
 
 func (api *SearchClient553) GetById(id string) (*Search, error) {
 	response, body, err := api.client.
-		Get(api.config.KibanaBaseUri+savedObjectsPath+"search/"+id).
+		Get(fmt.Sprintf("%s/%s/%s", api.config.KibanaBaseUri, api.getUriBase("search"), id)).
 		Set("kbn-version", api.config.KibanaVersion).
 		End()
 
@@ -274,7 +274,7 @@ func (api *SearchClient553) GetById(id string) (*Search, error) {
 
 func (api *SearchClient553) Delete(id string) error {
 	response, body, err := api.client.
-		Delete(api.config.KibanaBaseUri+savedObjectsPath+"search/"+id).
+		Delete(fmt.Sprintf("%s/%s/%s", api.config.KibanaBaseUri, api.getUriBase("search"), id)).
 		Set("kbn-version", api.config.KibanaVersion).
 		End()
 
