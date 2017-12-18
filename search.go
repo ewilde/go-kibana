@@ -55,10 +55,17 @@ type SearchAttributes struct {
 	KibanaSavedObjectMeta *SearchKibanaSavedObjectMeta `json:"kibanaSavedObjectMeta"`
 }
 
-type SearchCreateResult553 struct {
+type searchCreateResult553 struct {
 	Id      string `json:"_id"`
 	Type    string `json:"_type"`
 	Version int    `json:"_version"`
+}
+
+type searchReadResult553 struct {
+	Id      string           `json:"_id"`
+	Type    string           `json:"_type"`
+	Version int              `json:"_version"`
+	Source  *SearchAttributes `json:"_source"`
 }
 
 type SearchKibanaSavedObjectMeta struct {
@@ -206,7 +213,7 @@ func (api *searchClient553) Create(request *CreateSearchRequest) (*Search, error
 		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
 	}
 
-	createResponse := &SearchCreateResult553{}
+	createResponse := &searchCreateResult553{}
 	err := json.Unmarshal([]byte(body), createResponse)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse fields from create response, error: %v", err)
@@ -235,7 +242,7 @@ func (api *searchClient553) Update(id string, request *UpdateSearchRequest) (*Se
 		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
 	}
 
-	createResponse := &SearchCreateResult553{}
+	createResponse := &searchCreateResult553{}
 	error := json.Unmarshal([]byte(body), createResponse)
 	if error != nil {
 		return nil, fmt.Errorf("could not parse fields from create response, error: %v", error)
@@ -263,13 +270,18 @@ func (api *searchClient553) GetById(id string) (*Search, error) {
 		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
 	}
 
-	createResponse := &Search{}
+	createResponse := &searchReadResult553{}
 	error := json.Unmarshal([]byte(body), createResponse)
 	if error != nil {
 		return nil, fmt.Errorf("could not parse fields from get response, error: %v", error)
 	}
 
-	return createResponse, nil
+	return &Search{
+		Id: createResponse.Id,
+		Version: createResponse.Version,
+		Type: createResponse.Type,
+		Attributes: createResponse.Source,
+	} , nil
 }
 
 func (api *searchClient553) Delete(id string) error {

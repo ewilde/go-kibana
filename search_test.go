@@ -129,13 +129,13 @@ func Test_SearchRead(t *testing.T) {
 	assert.Nil(t, err, "Error getting search by id")
 	assert.NotNil(t, readSearch, "Search retrieved from get by id was null.")
 
-	assert.Equal(t, request.Attributes.Title, createdSearch.Attributes.Title)
-	assert.Equal(t, request.Attributes.Columns, createdSearch.Attributes.Columns)
-	assert.Equal(t, request.Attributes.Sort, createdSearch.Attributes.Sort)
-	assert.NotEmpty(t, request.Attributes.KibanaSavedObjectMeta.SearchSourceJSON)
+	assert.Equal(t, request.Attributes.Title, readSearch.Attributes.Title)
+	assert.Equal(t, request.Attributes.Columns, readSearch.Attributes.Columns)
+	assert.Equal(t, request.Attributes.Sort, readSearch.Attributes.Sort)
+	assert.NotEmpty(t, readSearch.Attributes.KibanaSavedObjectMeta.SearchSourceJSON)
 
 	responseSearch := &SearchSource{}
-	json.Unmarshal([]byte(createdSearch.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
+	json.Unmarshal([]byte(readSearch.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
 	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
 	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
 	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Query, responseSearch.Filter[0].Query.Match["geo.src"].Query)

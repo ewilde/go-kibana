@@ -3,6 +3,7 @@ package kibana
 import (
 	"fmt"
 	"github.com/google/go-querystring/query"
+	"log"
 	"net/url"
 	"os"
 	"reflect"
@@ -123,9 +124,11 @@ func NewDefaultConfig() *Config {
 }
 
 func NewClient(config *Config) *KibanaClient {
+	agent := NewHttpAgent(config, &NoAuthenticationHandler{})
+	agent.client.SetLogger(log.New(os.Stdout, "[DEBUG]", log.LstdFlags))
 	return &KibanaClient{
 		Config: config,
-		client: NewHttpAgent(config, &NoAuthenticationHandler{}),
+		client: agent,
 	}
 }
 
