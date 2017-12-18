@@ -20,12 +20,12 @@ type SearchClient interface {
 	GetById(id string) (*Search, error)
 	Delete(id string) error
 }
-type SearchClient600 struct {
+type searchClient600 struct {
 	config *Config
 	client *HttpAgent
 }
 
-type SearchClient553 struct {
+type searchClient553 struct {
 	config *Config
 	client *HttpAgent
 }
@@ -106,7 +106,7 @@ type SearchSourceBuilder struct {
 	filters      []*SearchFilter
 }
 
-func (api *SearchClient600) Create(request *CreateSearchRequest) (*Search, error) {
+func (api *searchClient600) Create(request *CreateSearchRequest) (*Search, error) {
 	response, body, err := api.client.
 		Post(api.config.KibanaBaseUri+savedObjectsPath+"search?overwrite=true").
 		Set("kbn-version", api.config.KibanaVersion).
@@ -130,7 +130,7 @@ func (api *SearchClient600) Create(request *CreateSearchRequest) (*Search, error
 	return createResponse, nil
 }
 
-func (api *SearchClient600) Update(id string, request *UpdateSearchRequest) (*Search, error) {
+func (api *searchClient600) Update(id string, request *UpdateSearchRequest) (*Search, error) {
 	response, body, err := api.client.
 		Post(api.config.KibanaBaseUri+savedObjectsPath+"search/"+id+"?overwrite=true").
 		Set("kbn-version", api.config.KibanaVersion).
@@ -154,7 +154,7 @@ func (api *SearchClient600) Update(id string, request *UpdateSearchRequest) (*Se
 	return createResponse, nil
 }
 
-func (api *SearchClient600) GetById(id string) (*Search, error) {
+func (api *searchClient600) GetById(id string) (*Search, error) {
 	response, body, err := api.client.
 		Get(api.config.KibanaBaseUri+savedObjectsPath+"search/"+id).
 		Set("kbn-version", api.config.KibanaVersion).
@@ -177,7 +177,7 @@ func (api *SearchClient600) GetById(id string) (*Search, error) {
 	return createResponse, nil
 }
 
-func (api *SearchClient600) Delete(id string) error {
+func (api *searchClient600) Delete(id string) error {
 	response, body, err := api.client.
 		Delete(api.config.KibanaBaseUri+savedObjectsPath+"search/"+id).
 		Set("kbn-version", api.config.KibanaVersion).
@@ -190,10 +190,10 @@ func (api *SearchClient600) Delete(id string) error {
 	return nil
 }
 
-func (api *SearchClient553) Create(request *CreateSearchRequest) (*Search, error) {
+func (api *searchClient553) Create(request *CreateSearchRequest) (*Search, error) {
 	id := uuid.NewV4().String()
 	response, body, errs := api.client.
-		Post(fmt.Sprintf("%s/%s/%s", api.config.KibanaBaseUri, api.getUriBase("search"), id)).
+		Post(api.config.BuildFullPath("/%s/%s", "search", id)).
 		Set("kbn-version", api.config.KibanaVersion).
 		Send(request.Attributes).
 		End()
@@ -220,9 +220,9 @@ func (api *SearchClient553) Create(request *CreateSearchRequest) (*Search, error
 	}, nil
 }
 
-func (api *SearchClient553) Update(id string, request *UpdateSearchRequest) (*Search, error) {
+func (api *searchClient553) Update(id string, request *UpdateSearchRequest) (*Search, error) {
 	response, body, err := api.client.
-		Post(fmt.Sprintf("%s/%s/%s", api.config.KibanaBaseUri, api.getUriBase("search"), id)).
+		Post(api.config.BuildFullPath("/%s/%s", "search", id)).
 		Set("kbn-version", api.config.KibanaVersion).
 		Send(request.Attributes).
 		End()
@@ -249,9 +249,9 @@ func (api *SearchClient553) Update(id string, request *UpdateSearchRequest) (*Se
 	}, nil
 }
 
-func (api *SearchClient553) GetById(id string) (*Search, error) {
+func (api *searchClient553) GetById(id string) (*Search, error) {
 	response, body, err := api.client.
-		Get(fmt.Sprintf("%s/%s/%s", api.config.KibanaBaseUri, api.getUriBase("search"), id)).
+		Get(api.config.BuildFullPath("/%s/%s", "search", id)).
 		Set("kbn-version", api.config.KibanaVersion).
 		End()
 
@@ -272,9 +272,9 @@ func (api *SearchClient553) GetById(id string) (*Search, error) {
 	return createResponse, nil
 }
 
-func (api *SearchClient553) Delete(id string) error {
+func (api *searchClient553) Delete(id string) error {
 	response, body, err := api.client.
-		Delete(fmt.Sprintf("%s/%s/%s", api.config.KibanaBaseUri, api.getUriBase("search"), id)).
+		Delete(api.config.BuildFullPath("/%s/%s", "search", id)).
 		Set("kbn-version", api.config.KibanaVersion).
 		End()
 
@@ -283,14 +283,6 @@ func (api *SearchClient553) Delete(id string) error {
 	}
 
 	return nil
-}
-
-func (api *SearchClient553) getUriBase(action string) string {
-	if api.config.KibanaType == KibanaTypeLogzio {
-		return action
-	}
-
-	return fmt.Sprintf("es_admin/.kibana/%s", action)
 }
 
 func NewSearchSourceBuilder() *SearchSourceBuilder {
