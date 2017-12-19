@@ -33,6 +33,7 @@ func TestMain(m *testing.M) {
 		runTestsWithoutContainers(m)
 	}
 }
+
 func runTestsWithoutContainers(m *testing.M) {
 	code := m.Run()
 	os.Exit(code)

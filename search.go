@@ -62,9 +62,9 @@ type searchCreateResult553 struct {
 }
 
 type searchReadResult553 struct {
-	Id      string           `json:"_id"`
-	Type    string           `json:"_type"`
-	Version int              `json:"_version"`
+	Id      string            `json:"_id"`
+	Type    string            `json:"_type"`
+	Version int               `json:"_version"`
 	Source  *SearchAttributes `json:"_source"`
 }
 
@@ -277,11 +277,11 @@ func (api *searchClient553) GetById(id string) (*Search, error) {
 	}
 
 	return &Search{
-		Id: createResponse.Id,
-		Version: createResponse.Version,
-		Type: createResponse.Type,
+		Id:         createResponse.Id,
+		Version:    createResponse.Version,
+		Type:       createResponse.Type,
 		Attributes: createResponse.Source,
-	} , nil
+	}, nil
 }
 
 func (api *searchClient553) Delete(id string) error {
