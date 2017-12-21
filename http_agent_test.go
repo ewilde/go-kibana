@@ -21,20 +21,20 @@ func createLogzAuthenticationHandler() *LogzAuthenticationHandler {
 	return &LogzAuthenticationHandler{
 		Auth0Uri: "https://logzio.auth0.com",
 		LogzUri:  "https://app-eu.logz.io",
-		ClientId: os.Getenv("LOGZ_CLIENT_ID"),
-		UserName: os.Getenv("LOGZ_USERNAME"),
-		Password: os.Getenv("LOGZ_PASSWORD"),
+		ClientId: os.Getenv(EnvLogzClientId),
+		UserName: os.Getenv(EnvKibanaUserName),
+		Password: os.Getenv(EnvKibanaPassword),
 	}
 }
 
 func testPreCheckForLogz(t *testing.T) {
-	if v := os.Getenv("LOGZ_CLIENT_ID"); v == "" {
-		t.Fatal("LOGZ_CLIENT_ID must be set for this test")
+	if v := os.Getenv("EnvLogzClientId"); v == "" {
+		t.Fatal("EnvLogzClientId must be set for this test")
 	}
-	if v := os.Getenv("LOGZ_USERNAME"); v == "" {
-		t.Fatal("LOGZ_USERNAME must be set for this test")
+	if v := os.Getenv("KIBANA_USERNAME"); v == "" {
+		t.Fatal("KIBANA_USERNAME must be set for this test")
 	}
-	if v := os.Getenv("LOGZ_PASSWORD"); v == "" {
-		t.Fatal("LOGZ_PASSWORD must be set for this test")
+	if v := os.Getenv("KIBANA_PASSWORD"); v == "" {
+		t.Fatal("KIBANA_PASSWORD must be set for this test")
 	}
 }
