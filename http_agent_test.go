@@ -28,13 +28,13 @@ func createLogzAuthenticationHandler() *LogzAuthenticationHandler {
 }
 
 func testPreCheckForLogz(t *testing.T) {
-	if v := os.Getenv("EnvLogzClientId"); v == "" {
-		t.Fatal("EnvLogzClientId must be set for this test")
+	if v := os.Getenv(EnvLogzClientId); v == "" {
+		t.Fatalf("%s must be set for this test", EnvLogzClientId)
 	}
-	if v := os.Getenv("KIBANA_USERNAME"); v == "" {
-		t.Fatal("KIBANA_USERNAME must be set for this test")
+	if v := os.Getenv(EnvKibanaUserName); v == "" {
+		t.Fatalf("%s must be set for this test", EnvKibanaUserName)
 	}
-	if v := os.Getenv("KIBANA_PASSWORD"); v == "" {
-		t.Fatal("KIBANA_PASSWORD must be set for this test")
+	if v := os.Getenv(EnvKibanaPassword); v == "" {
+		t.Fatalf("%s must be set for this test", EnvKibanaPassword)
 	}
 }
