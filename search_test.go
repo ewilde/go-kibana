@@ -2,6 +2,7 @@ package kibana
 
 import (
 	"encoding/json"
+	"github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -140,6 +141,21 @@ func Test_SearchRead(t *testing.T) {
 	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
 	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Query, responseSearch.Filter[0].Query.Match["geo.src"].Query)
 	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Type, responseSearch.Filter[0].Query.Match["geo.src"].Type)
+}
+
+func Test_SearchRead_Unknown_Search_Returns_404(t *testing.T) {
+	client := defaultTestKibanaClient()
+
+	searchClient := client.Search()
+	_, err := searchClient.GetById(uuid.NewV4().String())
+
+	assert.NotNil(t, err, "Expected to get a 404 error")
+	httpErr, ok := err.(*HttpError)
+	if !ok {
+		t.Error("Expected http error")
+	}
+
+	assert.Equal(t, 404, httpErr.Code)
 }
 
 func Test_Update(t *testing.T) {

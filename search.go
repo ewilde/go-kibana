@@ -125,7 +125,7 @@ func (api *searchClient600) Create(request *CreateSearchRequest) (*Search, error
 	}
 
 	if response.StatusCode >= 300 {
-		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
+		return nil, NewError(response, body, "Could not create search")
 	}
 
 	createResponse := &Search{}
@@ -149,7 +149,7 @@ func (api *searchClient600) Update(id string, request *UpdateSearchRequest) (*Se
 	}
 
 	if response.StatusCode >= 300 {
-		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
+		return nil, NewError(response, body, "Could not update search")
 	}
 
 	createResponse := &Search{}
@@ -172,7 +172,7 @@ func (api *searchClient600) GetById(id string) (*Search, error) {
 	}
 
 	if response.StatusCode >= 300 {
-		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
+		return nil, NewError(response, body, "Could not fetch search")
 	}
 
 	createResponse := &Search{}
@@ -191,7 +191,7 @@ func (api *searchClient600) Delete(id string) error {
 		End()
 
 	if err != nil {
-		return fmt.Errorf("could not delete search with id:%s response: %+v %s errors: %+v", id, response, body, err)
+		return NewError(response, body, "Could not delete search")
 	}
 
 	return nil
@@ -210,7 +210,7 @@ func (api *searchClient553) Create(request *CreateSearchRequest) (*Search, error
 	}
 
 	if response.StatusCode >= 300 {
-		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
+		NewError(response, body, "Could not create search")
 	}
 
 	createResponse := &searchCreateResult553{}
@@ -239,7 +239,7 @@ func (api *searchClient553) Update(id string, request *UpdateSearchRequest) (*Se
 	}
 
 	if response.StatusCode >= 300 {
-		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
+		return nil, NewError(response, body, "Could not update search")
 	}
 
 	createResponse := &searchCreateResult553{}
@@ -267,7 +267,11 @@ func (api *searchClient553) GetById(id string) (*Search, error) {
 	}
 
 	if response.StatusCode >= 300 {
-		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
+		if api.config.KibanaType == KibanaTypeLogzio && response.StatusCode == 400 { // bug in their api reports missing search as bad request
+			response.StatusCode = 404
+		}
+
+		return nil, NewError(response, body, "Could not fetch search")
 	}
 
 	createResponse := &searchReadResult553{}
@@ -291,7 +295,7 @@ func (api *searchClient553) Delete(id string) error {
 		End()
 
 	if err != nil {
-		return fmt.Errorf("could not delete search with id:%s response: %+v %s errors: %+v", id, response, body, err)
+		NewError(response, body, "Could not delete search")
 	}
 
 	return nil
