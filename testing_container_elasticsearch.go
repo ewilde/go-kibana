@@ -47,7 +47,7 @@ func newElasticSearchContainer(pool *dockertest.Pool, elasticSearchVersion strin
 		if !container.State.Running {
 			logOptions := &docker.LogsOptions{Container: container.ID}
 			if err := pool.Client.Logs(*logOptions); err != nil {
-				errors.New("Container is not running: " + container.State.StateString())
+				return errors.New("Container is not running: " + container.State.StateString())
 			}
 
 			buf := new(bytes.Buffer)

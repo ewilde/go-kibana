@@ -210,7 +210,7 @@ func (api *searchClient553) Create(request *CreateSearchRequest) (*Search, error
 	}
 
 	if response.StatusCode >= 300 {
-		NewError(response, body, "Could not create search")
+		return nil, NewError(response, body, "Could not create search")
 	}
 
 	createResponse := &searchCreateResult553{}
@@ -295,7 +295,7 @@ func (api *searchClient553) Delete(id string) error {
 		End()
 
 	if err != nil {
-		NewError(response, body, "Could not delete search")
+		return NewError(response, body, "Could not delete search")
 	}
 
 	return nil

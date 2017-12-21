@@ -3,7 +3,6 @@ package kibana
 import (
 	"fmt"
 	"github.com/google/go-querystring/query"
-	"log"
 	"net/url"
 	"os"
 	"reflect"
@@ -47,6 +46,7 @@ func ParseKibanaType(value string) KibanaType {
 }
 
 type Config struct {
+	Debug             bool
 	DefaultIndexId    string
 	ElasticSearchPath string
 	KibanaBaseUri     string
@@ -125,7 +125,6 @@ func NewDefaultConfig() *Config {
 
 func NewClient(config *Config) *KibanaClient {
 	agent := NewHttpAgent(config, &NoAuthenticationHandler{})
-	agent.client.SetLogger(log.New(os.Stdout, "[DEBUG]", log.LstdFlags))
 	return &KibanaClient{
 		Config: config,
 		client: agent,
