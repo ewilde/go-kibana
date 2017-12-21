@@ -131,10 +131,6 @@ func NewClient(config *Config) *KibanaClient {
 	}
 }
 
-func (kibanaClient *KibanaClient) Debug(value bool) {
-	kibanaClient.client.client.Debug = value
-}
-
 func (kibanaClient *KibanaClient) SetAuth(handler AuthenticationHandler) *KibanaClient {
 	kibanaClient.client.authHandler = handler
 	return kibanaClient
