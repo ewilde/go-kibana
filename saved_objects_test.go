@@ -27,7 +27,7 @@ func Test_SavedObjectsGetByType(t *testing.T) {
 	assert.Equal(t, "index-pattern", result.SavedObjects[0].Type)
 	assert.NotZero(t, result.SavedObjects[0].Version)
 	assert.NotNil(t, result.SavedObjects[0].Attributes)
-	assert.Equal(t, expectedIndexName(client), result.SavedObjects[0].Attributes["title"])
+	assert.Equal(t, expectedIndexName(client), result.SavedObjects[0].Id)
 }
 
 func Test_SavedObjectsGetByType_with_multiple_fields(t *testing.T) {
@@ -52,7 +52,7 @@ func Test_SavedObjectsGetByType_with_multiple_fields(t *testing.T) {
 	assert.Equal(t, "index-pattern", result.SavedObjects[0].Type)
 	assert.NotZero(t, result.SavedObjects[0].Version)
 	assert.NotNil(t, result.SavedObjects[0].Attributes)
-	assert.Equal(t, expectedIndexName(client), result.SavedObjects[0].Attributes["title"])
+	assert.Equal(t, expectedIndexName(client), result.SavedObjects[0].Id)
 	assert.Equal(t, "@timestamp", result.SavedObjects[0].Attributes["timeFieldName"])
 	assert.NotEmpty(t, result.SavedObjects[0].Attributes["fields"])
 }
