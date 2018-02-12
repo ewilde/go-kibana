@@ -26,7 +26,7 @@ func Test_SearchCreate(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	request, err := NewRequestBuilder().
+	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography filter on china").
 		WithDisplayColumns([]string{"_source"}).
 		WithSortColumns([]string{"@timestamp"}, Descending).
@@ -83,7 +83,7 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	request, err := NewRequestBuilder().
+	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography filter on china with errors").
 		WithDisplayColumns([]string{"_source"}).
 		WithSortColumns([]string{"@timestamp"}, Descending).
@@ -209,7 +209,7 @@ func createSearchRequest(client *KibanaClient, t *testing.T) (*CreateSearchReque
 
 	assert.Nil(t, err)
 
-	request, err := NewRequestBuilder().
+	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography filter on china").
 		WithDisplayColumns([]string{"_source"}).
 		WithSortColumns([]string{"@timestamp"}, Descending).

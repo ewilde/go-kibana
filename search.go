@@ -20,6 +20,7 @@ type SearchClient interface {
 	GetById(id string) (*Search, error)
 	Delete(id string) error
 }
+
 type searchClient600 struct {
 	config *Config
 	client *HttpAgent
@@ -53,12 +54,6 @@ type SearchAttributes struct {
 	Sort                  []string                     `json:"sort"`
 	Version               int                          `json:"version"`
 	KibanaSavedObjectMeta *SearchKibanaSavedObjectMeta `json:"kibanaSavedObjectMeta"`
-}
-
-type searchCreateResult553 struct {
-	Id      string `json:"_id"`
-	Type    string `json:"_type"`
-	Version int    `json:"_version"`
 }
 
 type searchReadResult553 struct {
@@ -213,10 +208,10 @@ func (api *searchClient553) Create(request *CreateSearchRequest) (*Search, error
 		return nil, NewError(response, body, "Could not create search")
 	}
 
-	createResponse := &searchCreateResult553{}
+	createResponse := &createResourceResult553{}
 	err := json.Unmarshal([]byte(body), createResponse)
 	if err != nil {
-		return nil, fmt.Errorf("could not parse fields from create response, error: %v", err)
+		return nil, fmt.Errorf("could not parse fields from create search response, error: %v", err)
 	}
 
 	return &Search{
@@ -242,7 +237,7 @@ func (api *searchClient553) Update(id string, request *UpdateSearchRequest) (*Se
 		return nil, NewError(response, body, "Could not update search")
 	}
 
-	createResponse := &searchCreateResult553{}
+	createResponse := &createResourceResult553{}
 	error := json.Unmarshal([]byte(body), createResponse)
 	if error != nil {
 		return nil, fmt.Errorf("could not parse fields from create response, error: %v", error)
@@ -334,7 +329,7 @@ func (builder *SearchSourceBuilder) Build() (*SearchSource, error) {
 	}, nil
 }
 
-func NewRequestBuilder() *SearchRequestBuilder {
+func NewSearchRequestBuilder() *SearchRequestBuilder {
 	return &SearchRequestBuilder{}
 }
 
