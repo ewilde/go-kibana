@@ -11,7 +11,7 @@ build: fmtcheck errcheck vet
 	go install
 
 test: docker-build fmtcheck
-	go test $(go list ./... | grep -v /vendor/)
+	go test -v $(go list ./... | grep -v /vendor/)
 
 vet:
 	@echo "go vet ."

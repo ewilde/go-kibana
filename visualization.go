@@ -122,14 +122,62 @@ func (api *visualizationClient600) Create(request *CreateVisualizationRequest) (
 }
 
 func (api *visualizationClient600) GetById(id string) (*Visualization, error) {
-	return nil, nil
+	response, body, err := api.client.
+		Get(api.config.KibanaBaseUri+savedObjectsPath+"visualization/"+id).
+		Set("kbn-version", api.config.KibanaVersion).
+		End()
+
+	if err != nil {
+		return nil, err[0]
+	}
+
+	if response.StatusCode >= 300 {
+		return nil, NewError(response, body, "Could not fetch visualization")
+	}
+
+	createResponse := &Visualization{}
+	error := json.Unmarshal([]byte(body), createResponse)
+	if error != nil {
+		return nil, fmt.Errorf("could not parse fields from get visualization response, error: %v", error)
+	}
+
+	return createResponse, nil
 }
 
 func (api *visualizationClient600) Update(id string, request *UpdateVisualizationRequest) (*Visualization, error) {
-	return nil, nil
+	response, body, err := api.client.
+		Post(api.config.KibanaBaseUri+savedObjectsPath+"visualization/"+id+"?overwrite=true").
+		Set("kbn-version", api.config.KibanaVersion).
+		Send(request).
+		End()
+
+	if err != nil {
+		return nil, err[0]
+	}
+
+	if response.StatusCode >= 300 {
+		return nil, NewError(response, body, "Could not update visualization")
+	}
+
+	createResponse := &Visualization{}
+	error := json.Unmarshal([]byte(body), createResponse)
+	if error != nil {
+		return nil, fmt.Errorf("could not parse fields from update visualization response, error: %v", error)
+	}
+
+	return createResponse, nil
 }
 
 func (api *visualizationClient600) Delete(id string) error {
+	response, body, err := api.client.
+		Delete(api.config.KibanaBaseUri+savedObjectsPath+"visualization/"+id).
+		Set("kbn-version", api.config.KibanaVersion).
+		End()
+
+	if err != nil {
+		return NewError(response, body, "Could not delete visualization")
+	}
+
 	return nil
 }
 

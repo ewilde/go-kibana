@@ -150,7 +150,7 @@ func (api *searchClient600) Update(id string, request *UpdateSearchRequest) (*Se
 	createResponse := &Search{}
 	error := json.Unmarshal([]byte(body), createResponse)
 	if error != nil {
-		return nil, fmt.Errorf("could not parse fields from create response, error: %v", error)
+		return nil, fmt.Errorf("could not parse fields from update search response, error: %v", error)
 	}
 
 	return createResponse, nil
@@ -173,7 +173,7 @@ func (api *searchClient600) GetById(id string) (*Search, error) {
 	createResponse := &Search{}
 	error := json.Unmarshal([]byte(body), createResponse)
 	if error != nil {
-		return nil, fmt.Errorf("could not parse fields from get response, error: %v", error)
+		return nil, fmt.Errorf("could not parse fields from get search response, error: %v", error)
 	}
 
 	return createResponse, nil
