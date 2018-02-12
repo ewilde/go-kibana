@@ -88,7 +88,7 @@ var seachClientFromVersion = map[string]func(kibanaClient *KibanaClient) SearchC
 
 var visualizationClientFromVersion = map[string]func(kibanaClient *KibanaClient) VisualizationClient{
 	"6.0.0": func(kibanaClient *KibanaClient) VisualizationClient {
-		return nil
+		return &visualizationClient600{config: kibanaClient.Config, client: kibanaClient.client}
 	},
 	"5.5.3": func(kibanaClient *KibanaClient) VisualizationClient {
 		return &visualizationClient553{config: kibanaClient.Config, client: kibanaClient.client}

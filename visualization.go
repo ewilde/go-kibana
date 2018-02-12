@@ -1,14 +1,15 @@
 package kibana
 
 import (
-	"github.com/satori/go.uuid"
 	"encoding/json"
 	"fmt"
+	"github.com/satori/go.uuid"
 )
 
 type VisualizationClient interface {
 	Create(request *CreateVisualizationRequest) (*Visualization, error)
 	GetById(id string) (*Visualization, error)
+	Update(id string, request *UpdateVisualizationRequest) (*Visualization, error)
 	Delete(id string) error
 }
 
@@ -16,10 +17,14 @@ type CreateVisualizationRequest struct {
 	Attributes *VisualizationAttributes `json:"attributes"`
 }
 
+type UpdateVisualizationRequest struct {
+	Attributes *VisualizationAttributes `json:"attributes"`
+}
+
 type Visualization struct {
-	Id         string            `json:"id"`
-	Type       string            `json:"type"`
-	Version    int               `json:"version"`
+	Id         string                   `json:"id"`
+	Type       string                   `json:"type"`
+	Version    int                      `json:"version"`
 	Attributes *VisualizationAttributes `json:"attributes"`
 }
 
@@ -38,15 +43,20 @@ type VisualizationRequestBuilder struct {
 	savedSearchId      string
 }
 
+type visualizationClient600 struct {
+	config *Config
+	client *HttpAgent
+}
+
 type visualizationClient553 struct {
 	config *Config
 	client *HttpAgent
 }
 
 type visualizationReadResult553 struct {
-	Id      string            `json:"_id"`
-	Type    string            `json:"_type"`
-	Version int               `json:"_version"`
+	Id      string                   `json:"_id"`
+	Type    string                   `json:"_type"`
+	Version int                      `json:"_version"`
 	Source  *VisualizationAttributes `json:"_source"`
 }
 
@@ -87,6 +97,41 @@ func (builder *VisualizationRequestBuilder) Build() (*CreateVisualizationRequest
 	}, nil
 }
 
+func (api *visualizationClient600) Create(request *CreateVisualizationRequest) (*Visualization, error) {
+	response, body, err := api.client.
+		Post(api.config.KibanaBaseUri+savedObjectsPath+"visualization?overwrite=true").
+		Set("kbn-version", api.config.KibanaVersion).
+		Send(request).
+		End()
+
+	if err != nil {
+		return nil, err[0]
+	}
+
+	if response.StatusCode >= 300 {
+		return nil, NewError(response, body, "Could not create visualization")
+	}
+
+	createResponse := &Visualization{}
+	error := json.Unmarshal([]byte(body), createResponse)
+	if error != nil {
+		return nil, fmt.Errorf("could not parse fields from create visualization response, error: %v", error)
+	}
+
+	return createResponse, nil
+}
+
+func (api *visualizationClient600) GetById(id string) (*Visualization, error) {
+	return nil, nil
+}
+
+func (api *visualizationClient600) Update(id string, request *UpdateVisualizationRequest) (*Visualization, error) {
+	return nil, nil
+}
+
+func (api *visualizationClient600) Delete(id string) error {
+	return nil
+}
 
 func (api *visualizationClient553) Create(request *CreateVisualizationRequest) (*Visualization, error) {
 	id := uuid.NewV4().String()
@@ -145,7 +190,31 @@ func (api *visualizationClient553) GetById(id string) (*Visualization, error) {
 	}, nil
 }
 
-func (api *visualizationClient553) Delete(id string) (error) {
+func (api *visualizationClient553) Update(id string, request *UpdateVisualizationRequest) (*Visualization, error) {
+	response, body, err := api.client.
+		Post(api.config.BuildFullPath("/%s/%s", "visualization", id)).
+		Set("kbn-version", api.config.KibanaVersion).
+		Send(request.Attributes).
+		End()
+
+	if err != nil {
+		return nil, err[0]
+	}
+
+	if response.StatusCode >= 300 {
+		return nil, NewError(response, body, "Could not update visualization")
+	}
+
+	createResponse := &createResourceResult553{}
+	error := json.Unmarshal([]byte(body), createResponse)
+	if error != nil {
+		return nil, fmt.Errorf("could not parse fields from update visualization response, error: %v", error)
+	}
+
+	return api.GetById(createResponse.Id)
+}
+
+func (api *visualizationClient553) Delete(id string) error {
 	response, body, err := api.client.
 		Delete(api.config.BuildFullPath("/%s/%s", "visualization", id)).
 		Set("kbn-version", api.config.KibanaVersion).
