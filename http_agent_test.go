@@ -8,7 +8,10 @@ import (
 )
 
 func Test_LogzAuthentication_handler(t *testing.T) {
-	testPreCheckForLogz(t)
+	if skip := testPreCheckForLogz(t); skip {
+		t.Skip()
+		return
+	}
 
 	handler := createLogzAuthenticationHandler()
 
@@ -17,7 +20,12 @@ func Test_LogzAuthentication_handler(t *testing.T) {
 	assert.NotEmpty(t, handler.sessionToken, "Session token should not be empty")
 }
 
-func testPreCheckForLogz(t *testing.T) {
+func testPreCheckForLogz(t *testing.T) bool {
+	config := NewDefaultConfig()
+	if config.KibanaType == KibanaTypeVanilla {
+		return true
+	}
+
 	if v := os.Getenv(EnvLogzClientId); v == "" {
 		t.Fatalf("%s must be set for this test", EnvLogzClientId)
 	}
@@ -27,4 +35,6 @@ func testPreCheckForLogz(t *testing.T) {
 	if v := os.Getenv(EnvKibanaPassword); v == "" {
 		t.Fatalf("%s must be set for this test", EnvKibanaPassword)
 	}
+
+	return false
 }

@@ -26,7 +26,7 @@ func Test_SearchCreate(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	request, err := NewRequestBuilder().
+	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography filter on china").
 		WithDisplayColumns([]string{"_source"}).
 		WithSortColumns([]string{"@timestamp"}, Descending).
@@ -83,7 +83,7 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	request, err := NewRequestBuilder().
+	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography filter on china with errors").
 		WithDisplayColumns([]string{"_source"}).
 		WithSortColumns([]string{"@timestamp"}, Descending).
@@ -158,7 +158,7 @@ func Test_SearchRead_Unknown_Search_Returns_404(t *testing.T) {
 	assert.Equal(t, 404, httpErr.Code)
 }
 
-func Test_Update(t *testing.T) {
+func Test_SearchUpdate(t *testing.T) {
 	client := DefaultTestKibanaClient()
 
 	request, _, err := createSearchRequest(client, t)
@@ -177,7 +177,7 @@ func Test_Update(t *testing.T) {
 	assert.Equal(t, "China updated", search.Attributes.Title)
 }
 
-func Test_Delete(t *testing.T) {
+func Test_SearchDelete(t *testing.T) {
 	client := DefaultTestKibanaClient()
 
 	request, _, err := createSearchRequest(client, t)
@@ -209,7 +209,7 @@ func createSearchRequest(client *KibanaClient, t *testing.T) (*CreateSearchReque
 
 	assert.Nil(t, err)
 
-	request, err := NewRequestBuilder().
+	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography filter on china").
 		WithDisplayColumns([]string{"_source"}).
 		WithSortColumns([]string{"@timestamp"}, Descending).

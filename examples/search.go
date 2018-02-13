@@ -22,7 +22,7 @@ func createSearch() (*kibana.Search, error) {
 		}).
 		Build()
 
-	request, _ := kibana.NewRequestBuilder().
+	request, _ := kibana.NewSearchRequestBuilder().
 		WithTitle("Geography filter on china with errors").
 		WithDisplayColumns([]string{"_source"}).
 		WithSortColumns([]string{"@timestamp"}, kibana.Descending).
