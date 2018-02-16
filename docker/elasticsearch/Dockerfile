@@ -1,8 +1,10 @@
 ARG ELK_VERSION=6.0.0
-ARG ELK_PACK=oss
+ARG ELK_PACK=-oss
 
 FROM docker.elastic.co/elasticsearch/elasticsearch$ELK_PACK:$ELK_VERSION
 
+USER root
+RUN yum install -y openssl
 RUN yum install -y epel-release && yum install -y nodejs && \
     npm install -g makelogs
 
