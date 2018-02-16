@@ -5,7 +5,7 @@ services:
 - docker
 env:
   matrix:
-  - ELK_VERSION=5.5.3   KIBANA_TYPE=KibanaTypeVanilla
+  - ELK_VERSION=5.5.3   KIBANA_TYPE=KibanaTypeVanilla   ELASTIC_PACK=
   - ELK_VERSION=5.5.3   KIBANA_TYPE=KibanaTypeLogzio    KIBANA_URI=https://app-eu.logz.io    ELASTIC_SEARCH_PATH=/kibana/elasticsearch/logzioCustomerKibanaIndex
   - ELK_VERSION=6.2.1   KIBANA_TYPE=KibanaTypeVanilla
   global:
