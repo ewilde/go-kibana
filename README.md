@@ -64,6 +64,8 @@ func createVisualization(search *kibana.Search) (*kibana.Visualization, error) {
 By default a saved search won't display the `filter` on the search UI.
 Use the `meta` structure to enable this, as shown below:
 
+![image](https://user-images.githubusercontent.com/329397/36351467-714aeac2-14a2-11e8-9f83-225844da579e.png)
+
 ```go
 client := DefaultTestKibanaClient()
 
@@ -82,7 +84,7 @@ client := DefaultTestKibanaClient()
 				Index: client.Config.DefaultIndexId,
 				Negate: false,
 				Disabled: false,
-				Alias: "Chinaz",
+				Alias: "China",
 				Type: "phrase",
 				Key: "geo.src",
 				Params: &SearchFilterQueryAttributes {
