@@ -21,6 +21,18 @@ func Test_SearchCreate(t *testing.T) {
 					},
 				},
 			},
+			Meta: &SearchFilterMetaData{
+				Index: client.Config.DefaultIndexId,
+				Negate: false,
+				Disabled: false,
+				Alias: "Chinaz",
+				Type: "phrase",
+				Key: "geo.src",
+				Params: &SearchFilterQueryAttributes {
+					Query: "CN",
+					Type: "phrase",
+				},
+			},
 		}).
 		Build()
 
@@ -49,9 +61,19 @@ func Test_SearchCreate(t *testing.T) {
 	responseSearch := &SearchSource{}
 	json.Unmarshal([]byte(response.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
 	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
+
 	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
 	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Query, responseSearch.Filter[0].Query.Match["geo.src"].Query)
 	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Type, responseSearch.Filter[0].Query.Match["geo.src"].Type)
+
+	assert.Equal(t, requestSearch.Filter[0].Meta.Type, responseSearch.Filter[0].Meta.Type)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Key, responseSearch.Filter[0].Meta.Key)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Alias, responseSearch.Filter[0].Meta.Alias)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Disabled, responseSearch.Filter[0].Meta.Disabled)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Negate, responseSearch.Filter[0].Meta.Negate)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Index, responseSearch.Filter[0].Meta.Index)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Params.Query, responseSearch.Filter[0].Meta.Params.Query)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Params.Type, responseSearch.Filter[0].Meta.Params.Type)
 }
 
 func Test_SearchCreate_with_two_filters(t *testing.T) {
