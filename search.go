@@ -96,6 +96,7 @@ type SearchFilterMetaData struct {
 	Alias    string                       `json:"alias"`
 	Type     string                       `json:"type"`
 	Key      string                       `json:"key"`
+	Value    string                       `json:"value"`
 	Params   *SearchFilterQueryAttributes `json:"params"`
 }
 

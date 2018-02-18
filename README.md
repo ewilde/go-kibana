@@ -87,6 +87,7 @@ client := DefaultTestKibanaClient()
 				Alias: "China",
 				Type: "phrase",
 				Key: "geo.src",
+				Value: "CN",
 				Params: &SearchFilterQueryAttributes {
 					Query: "CN",
 					Type: "phrase",

@@ -25,9 +25,10 @@ func Test_SearchCreate(t *testing.T) {
 				Index:    client.Config.DefaultIndexId,
 				Negate:   false,
 				Disabled: false,
-				Alias:    "Chinaz",
+				Alias:    "China",
 				Type:     "phrase",
 				Key:      "geo.src",
+				Value:    "CN",
 				Params: &SearchFilterQueryAttributes{
 					Query: "CN",
 					Type:  "phrase",
