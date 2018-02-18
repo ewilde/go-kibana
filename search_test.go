@@ -22,15 +22,15 @@ func Test_SearchCreate(t *testing.T) {
 				},
 			},
 			Meta: &SearchFilterMetaData{
-				Index: client.Config.DefaultIndexId,
-				Negate: false,
+				Index:    client.Config.DefaultIndexId,
+				Negate:   false,
 				Disabled: false,
-				Alias: "Chinaz",
-				Type: "phrase",
-				Key: "geo.src",
-				Params: &SearchFilterQueryAttributes {
+				Alias:    "Chinaz",
+				Type:     "phrase",
+				Key:      "geo.src",
+				Params: &SearchFilterQueryAttributes{
 					Query: "CN",
-					Type: "phrase",
+					Type:  "phrase",
 				},
 			},
 		}).
