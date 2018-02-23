@@ -29,14 +29,14 @@ type Dashboard struct {
 }
 
 type DashboardAttributes struct {
-	Title                 string                      `json:"title"`
-	Description           string                      `json:"description"`
-	Version               int                         `json:"version"`
-	PanelsJson            string                      `json:"panelsJSON"`
-	OptionsJson           string                      `json:"optionsJSON"`
-	UiStateJSON           string                      `json:"uiStateJSON"`
-	TimeRestore           bool                        `json:"timeRestore"`
-	KibanaSavedObjectMeta SearchKibanaSavedObjectMeta `json:"kibanaSavedObjectMeta"`
+	Title                 string                       `json:"title"`
+	Description           string                       `json:"description"`
+	Version               int                          `json:"version"`
+	PanelsJson            string                       `json:"panelsJSON"`
+	OptionsJson           string                       `json:"optionsJSON"`
+	UiStateJSON           string                       `json:"uiStateJSON"`
+	TimeRestore           bool                         `json:"timeRestore"`
+	KibanaSavedObjectMeta *SearchKibanaSavedObjectMeta `json:"kibanaSavedObjectMeta"`
 }
 
 type DashboardRequestBuilder struct {
@@ -46,7 +46,7 @@ type DashboardRequestBuilder struct {
 	optionsJson           string
 	uiStateJson           string
 	timeRestore           bool
-	kibanaSavedObjectMeta SearchKibanaSavedObjectMeta
+	kibanaSavedObjectMeta *SearchKibanaSavedObjectMeta
 }
 
 type dashboardClient600 struct {
@@ -97,6 +97,11 @@ func (builder *DashboardRequestBuilder) WithUiStateJson(uiStateJson string) *Das
 
 func (builder *DashboardRequestBuilder) WithTimeRestore(timeRestore bool) *DashboardRequestBuilder {
 	builder.timeRestore = timeRestore
+	return builder
+}
+
+func (builder *DashboardRequestBuilder) WithKibanaSavedObjectMeta(meta *SearchKibanaSavedObjectMeta) *DashboardRequestBuilder {
+	builder.kibanaSavedObjectMeta = meta
 	return builder
 }
 
