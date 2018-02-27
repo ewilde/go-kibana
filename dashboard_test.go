@@ -84,7 +84,7 @@ func Test_DashboardRead(t *testing.T) {
 	assert.Equal(t, request.Attributes.Version, readDashboard.Attributes.Version)
 }
 
-func Test_DashboardRead_Unknown_Search_Returns_404(t *testing.T) {
+func Test_DashboardRead_Unknown_Dashboard_Returns_404(t *testing.T) {
 	client := DefaultTestKibanaClient()
 
 	dashboardClient := client.Dashboard()

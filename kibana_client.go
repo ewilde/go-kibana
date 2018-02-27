@@ -16,6 +16,7 @@ const EnvKibanaPassword = "KIBANA_PASSWORD"
 const EnvKibanaVersion = "ELK_VERSION"
 const EnvKibanaIndexId = "KIBANA_INDEX_ID"
 const EnvKibanaType = "KIBANA_TYPE"
+const EnvKibanaDebug = "KIBANA_DEBUG"
 const EnvLogzClientId = "LOGZ_CLIENT_ID"
 const DefaultKibanaUri = "http://localhost:5601"
 const DefaultElasticSearchPath = "/es_admin/.kibana"
@@ -192,6 +193,10 @@ func NewDefaultConfig() *Config {
 		}
 	}
 
+	if value := os.Getenv(EnvKibanaDebug); value != "" {
+		config.Debug = true
+	}
+
 	return config
 }
 
@@ -205,6 +210,12 @@ func NewClient(config *Config) *KibanaClient {
 
 func (kibanaClient *KibanaClient) SetAuth(handler AuthenticationHandler) *KibanaClient {
 	kibanaClient.client.authHandler = handler
+	return kibanaClient
+}
+
+
+func (kibanaClient *KibanaClient) ChangeAccount(accountId string) *KibanaClient {
+	kibanaClient.client.authHandler.Initialize()
 	return kibanaClient
 }
 

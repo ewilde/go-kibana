@@ -20,6 +20,7 @@ func Test_LogzAuthentication_handler(t *testing.T) {
 	assert.NotEmpty(t, handler.sessionToken, "Session token should not be empty")
 }
 
+
 func testPreCheckForLogz(t *testing.T) bool {
 	config := NewDefaultConfig()
 	if config.KibanaType == KibanaTypeVanilla {
