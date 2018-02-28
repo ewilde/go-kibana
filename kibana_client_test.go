@@ -4,8 +4,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
-	"github.com/parnurzeal/gorequest"
-	"github.com/ory-am/common/handler"
 )
 
 func Test_NewClient(t *testing.T) {
@@ -41,16 +39,21 @@ func Test_Change_account(t *testing.T) {
 
 	// 3. Now assert this search does not exist when logged into this account
 	_, err = searchClient.GetById(searchFromAccount1.Id)
-	assert.NotNil(t, err)
+	if !assert.NotNil(t, err) {
+		t.Fatal()
+	}
+
 	httpErr, ok := err.(*HttpError)
 	if !ok {
 		t.Error("Expected http error")
 	}
 
-	assert.Equal(t, 404, httpErr.Code)
+	if !assert.Equal(t, 404, httpErr.Code) {
+		t.Fatal()
+	}
 
 	// 4. Swap back to the first account and clean up
-	handler.changeAccount(os.Getenv("LOGZ_IO_ACCOUNT_ID_1"), client.client.client)
+	client.ChangeAccount(os.Getenv("LOGZ_IO_ACCOUNT_ID_1"))
 	err = searchClient.Delete(searchFromAccount1.Id)
 	assert.Nil(t, err)
 }

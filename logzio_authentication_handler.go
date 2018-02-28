@@ -58,7 +58,7 @@ func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) e
 	return nil
 }
 
-func (auth *LogzAuthenticationHandler) ChangeAccount(accountId string, agent *gorequest.SuperAgent) error {
+func (auth *LogzAuthenticationHandler) ChangeAccount(accountId string, agent *HttpAgent) error {
 	response, body, errs := agent.Get(fmt.Sprintf("%s/user/session/replace/%s", auth.LogzUri, accountId)).End()
 	if errs != nil {
 		return errs[0]
@@ -69,7 +69,7 @@ func (auth *LogzAuthenticationHandler) ChangeAccount(accountId string, agent *go
 	}
 
 	responseMap  := map[string]interface{}{}
-	if err := json.Unmarshal([]byte(body), responseMap); err != nil {
+	if err := json.Unmarshal([]byte(body), &responseMap); err != nil {
 		return err
 	}
 

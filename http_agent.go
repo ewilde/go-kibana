@@ -12,7 +12,7 @@ type HttpAgent struct {
 
 type AuthenticationHandler interface {
 	Initialize(agent *gorequest.SuperAgent) error
-	ChangeAccount(accountId string, agent *gorequest.SuperAgent) error
+	ChangeAccount(accountId string, agent *HttpAgent) error
 }
 
 type NoAuthenticationHandler struct {
@@ -106,7 +106,7 @@ func (auth *BasicAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) 
 	return nil
 }
 
-func (auth *BasicAuthenticationHandler) ChangeAccount(accountId string, agent *gorequest.SuperAgent) error {
+func (auth *BasicAuthenticationHandler) ChangeAccount(accountId string, agent *HttpAgent) error {
 	return nil
 }
 
@@ -114,7 +114,7 @@ func (auth *NoAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) err
 	return nil
 }
 
-func (auth *NoAuthenticationHandler) ChangeAccount(accountId string, agent *gorequest.SuperAgent) error {
+func (auth *NoAuthenticationHandler) ChangeAccount(accountId string, agent *HttpAgent) error {
 	return nil
 }
 

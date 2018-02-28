@@ -214,9 +214,8 @@ func (kibanaClient *KibanaClient) SetAuth(handler AuthenticationHandler) *Kibana
 }
 
 
-func (kibanaClient *KibanaClient) ChangeAccount(accountId string) *KibanaClient {
-	kibanaClient.client.authHandler.Initialize()
-	return kibanaClient
+func (kibanaClient *KibanaClient) ChangeAccount(accountId string) error {
+	return kibanaClient.client.authHandler.ChangeAccount(accountId, kibanaClient.client)
 }
 
 func (kibanaClient *KibanaClient) Search() SearchClient {
