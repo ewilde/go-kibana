@@ -1,10 +1,10 @@
 package kibana
 
 import (
-	"github.com/parnurzeal/gorequest"
-	"fmt"
-	"errors"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/parnurzeal/gorequest"
 )
 
 func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) error {
@@ -68,7 +68,7 @@ func (auth *LogzAuthenticationHandler) ChangeAccount(accountId string, agent *Ht
 		return errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
 	}
 
-	responseMap  := map[string]interface{}{}
+	responseMap := map[string]interface{}{}
 	if err := json.Unmarshal([]byte(body), &responseMap); err != nil {
 		return err
 	}

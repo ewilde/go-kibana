@@ -13,8 +13,6 @@ func Test_NewClient(t *testing.T) {
 	assert.Equal(t, os.Getenv(EnvKibanaUri), kibanaClient.Config.KibanaBaseUri)
 }
 
-
-
 func Test_Change_account(t *testing.T) {
 	if skip := testPreCheckForLogz(t); skip {
 		t.Skip()
@@ -33,7 +31,7 @@ func Test_Change_account(t *testing.T) {
 
 	// 2. swap over to the second account (this is the action of our test)
 	err = client.ChangeAccount(os.Getenv("LOGZ_IO_ACCOUNT_ID_2"))
-	if !assert.Nil(t, err){
+	if !assert.Nil(t, err) {
 		t.Fatal()
 	}
 
