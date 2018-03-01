@@ -13,6 +13,34 @@ func Test_NewClient(t *testing.T) {
 	assert.Equal(t, os.Getenv(EnvKibanaUri), kibanaClient.Config.KibanaBaseUri)
 }
 
+func Test_Change_account(t *testing.T) {
+	if skip := testPreCheckForLogz(t); skip {
+		t.Skip()
+		return
+	}
+
+	// 1. create a saved search using the default account
+	client := DefaultTestKibanaClient()
+
+	request, _, err := createSearchRequest(client, t)
+	assert.Nil(t, err)
+
+	searchClient := client.Search()
+	searchFromAccount1, err := searchClient.Create(request)
+	assert.Nil(t, err)
+
+	// 2. swap over to the second account (this is the action of our test)
+	err = client.ChangeAccount(os.Getenv("LOGZ_IO_ACCOUNT_ID_2"))
+	if !assert.Nil(t, err) {
+		t.Fatal()
+	}
+
+	// 3. Swap back to the first account and clean up
+	client.ChangeAccount(os.Getenv("LOGZ_IO_ACCOUNT_ID_1"))
+	err = searchClient.Delete(searchFromAccount1.Id)
+	assert.Nil(t, err)
+}
+
 func TestMain(m *testing.M) {
 	client := DefaultTestKibanaClient()
 
