@@ -6,7 +6,7 @@ services:
 env:
   matrix:
   - ELK_VERSION=5.5.3   KIBANA_TYPE=KibanaTypeVanilla   ELASTIC_PACK=
-  - ELK_VERSION=5.5.3   KIBANA_TYPE=KibanaTypeLogzio    KIBANA_URI=https://app-eu.logz.io    ELASTIC_SEARCH_PATH=/kibana/elasticsearch/logzioCustomerKibanaIndex
+  - ELK_VERSION=5.5.3   KIBANA_DEBUG=1                  KIBANA_TYPE=KibanaTypeLogzio    KIBANA_URI=https://app-eu.logz.io    ELASTIC_SEARCH_PATH=/kibana/elasticsearch/logzioCustomerKibanaIndex
   - ELK_VERSION=6.2.1   KIBANA_TYPE=KibanaTypeVanilla
   global:
   - secure: q5fWz4h3MJvt2eIwnAoRkNWK0RrgEcJApe/H/Ejf55hJSijX/DhHxOwjbo/TDaaCVoMkb9HSzKEhF3tDdduuRulGibvmAapyumHUa5fJmwlHwLXgrP7YiJ+4f/AcupoGRRiKOdUNwPVYo48ewaj44y/0Wu8L6Lzi09LaSs6dRAsN8IfVwhtjCxduPsXDsMNvzNv6VlW4XZkICRpxq1e4+8RK/DiWk3J5e4v3g80fzNoXx3g1J0zjcXu5RR0qlkY16f7BHilIPhaBltJS3vu0g+jKEWf7dLhjTHM6Zs2qRg9eywNjDEDVhSQkLdJXG1FNQRpsAFpIkjilC5PU3nX5Wft39QjUXQxjFtSkiwYt5HS9A56IczstNzy7hj3SGdvXM9w3ugkRW5FPwQfZ2x5gbbMikIswM+3VbZRi4cf8c3P23LBYxgN9gCHWFHyf7Ta/L4AM/Yqq0aHWbn4OgKa+V+uIhrW6I3DxlOJXAjQU3/CGrmidhAu7kfFikV+G0cXbtnyPuf5n12wcx21b5QJeOgNroLHS7cfYQEWn12wvyJImq0r6RGJxjIJBqxc9mSOu19aX7UaKlM1qEyen/UflcheKfUtzTw7knVLcYWVVX5Y07k3P/do5TRhofUSJ+DBexCkrY+3c+N78/V82JPBxpGaRdGJ1VsW8KxlO5kdXpBg=
