@@ -213,7 +213,6 @@ func (kibanaClient *KibanaClient) SetAuth(handler AuthenticationHandler) *Kibana
 	return kibanaClient
 }
 
-
 func (kibanaClient *KibanaClient) ChangeAccount(accountId string) error {
 	return kibanaClient.client.authHandler.ChangeAccount(accountId, kibanaClient.client)
 }
