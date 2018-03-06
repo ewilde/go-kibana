@@ -41,9 +41,9 @@ docker-build:
 		exit 1; \
 	fi
 	@if [ "$(KIBANA_TYPE)" = "KibanaTypeVanilla" ]; then \
-		cd docker/elasticsearch && docker build --build-arg ELK_VERSION=$(ELK_VERSION) --build-arg ELK_PACK=$(ELK_PACK) . -t elastic-local:$(ELK_VERSION); \
+		cd docker/elasticsearch && docker build --build-arg ELK_VERSION=$(ELK_VERSION) --build-arg ELK_PACK=$(ELK_PACK) . -t elastic-local$(ELK_PACK):$(ELK_VERSION); \
 	fi
 
 kibana-start: docker-build
-	@sh -c "'$(CURDIR)/scripts/start-kibana-$(ELK_VERSION).sh'"
+	@sh -c "'$(CURDIR)/scripts/start-kibana-$(ELK_VERSION)$(ELK_PACK).sh'"
 .PHONY: build docker-build kibana-start test testacc vet fmt fmtcheck errcheck vendor-status test-compile

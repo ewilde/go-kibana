@@ -245,3 +245,171 @@ POST /kibana/elasticsearch/logzioCustomerKibanaIndex/visualization/0d41e0b0-0658
   "created": true
 }
 ```
+
+# Create alert
+POST https://app-eu.logz.io/triggers/alerts
+**Request body**
+```json
+{
+  "search": {
+    "queryString": "*",
+    "filter": "{\"bool\":{\"must\":[{\"match_phrase\":{\"service_name\":{\"query\":\"accountapi\"}}},{\"match_phrase\":{\"level\":{\"query\":\"ERROR\"}}},{\"match_phrase\":{\"stack\":{\"query\":\"ramwong\"}}}],\"must_not\":[]}}",
+    "periodInMinutes": 5,
+    "metricsAggregations": null,
+    "source": {
+      "allTimelessIndices": false,
+      "timelessIndice": [],
+      "allSubAccountsIndices": true,
+      "subAccountsIds": []
+    },
+    "groupBy": []
+  },
+  "senderState": "dashboard.kibana",
+  "triggerType": "ALERT",
+  "name": "ramwong - accountapi errors",
+  "description": "all account api errors on ramwong",
+  "triggerOn": {
+    "aggregation": {
+      "aggregationType": "NONE",
+      "fieldToAggregateOn": null
+    },
+    "severities": [
+      {
+        "severity": "HIGH",
+        "threshold": 1
+      }
+    ],
+    "threshold": 0,
+    "type": "CONDITION",
+    "comparisonOperator": "GREATER_THAN"
+  },
+  "output": {
+    "format": {
+      "type": "JSON",
+      "fieldsConfig": null
+    },
+    "target": {
+      "emailNotifications": "{\"notifications\":[]}",
+      "notificationEndpoints": [
+        {
+          "endpointType": "Slack",
+          "id": 811,
+          "title": "Test errors",
+          "description": null,
+          "url": "https://hooks.slack.com/services/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"
+        }
+      ],
+      "suppressNotificationInMinutes": 60,
+      "timelessIndex": null,
+      "severity": null
+    }
+  }
+}
+```
+**Response body**
+```json{
+         "id": 10727,
+         "name": "ramwong - accountapi errors",
+         "description": "all account api errors on ramwong",
+         "enabled": true,
+         "search": {
+           "queryString": "*",
+           "filter": "{\"bool\":{\"must\":[{\"match_phrase\":{\"service_name\":{\"query\":\"accountapi\"}}},{\"match_phrase\":{\"level\":{\"query\":\"ERROR\"}}},{\"match_phrase\":{\"stack\":{\"query\":\"ramwong\"}}}],\"must_not\":[]}}",
+           "groupBy": [],
+           "periodInMinutes": 5,
+           "source": {
+             "allTimelessIndices": false,
+             "timelessIndices": [],
+             "allSubAccounts": true,
+             "subAccountsIds": []
+           },
+           "metricsAggregations": []
+         },
+         "triggerOn": {
+           "type": "CONDITION",
+           "aggregation": {
+             "aggregationType": "NONE",
+             "fieldToAggregateOn": null
+           },
+           "comparisonOperator": "GREATER_THAN",
+           "threshold": 1,
+           "severities": [
+             {
+               "severity": "HIGH",
+               "threshold": 1
+             }
+           ]
+         },
+         "output": {
+           "format": {
+             "type": "JSON"
+           },
+           "target": {
+             "severity": "HIGH",
+             "emailNotifications": "{\"notifications\":[]}",
+             "notificationEndpoints": [
+               {
+                 "id": 811,
+                 "accountId": 16533,
+                 "type": "HTTP",
+                 "templateName": "Slack",
+                 "description": null,
+                 "title": "Test errors",
+                 "createdDate": 1500299065000,
+                 "modifiedDate": 1516189356000,
+                 "params": {
+                   "url": "https://hooks.slack.com/services/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",
+                   "method": "POST",
+                   "headers": null,
+                   "bodyTemplate": {
+                     "icon_url": "https://s3.amazonaws.com/logzio-static-content-cdn/logzio-logo.png",
+                     "username": "Logz.io Alerts",
+                     "attachments": [
+                       {
+                         "author_name": "{{&alert_severity}} severity",
+                         "author_icon": "https://s3.amazonaws.com/logzio-static-content-cdn/slack/{{&alert_severity_img}}.png",
+                         "fallback": "{{&alert_severity}}: {{&alert_title}}",
+                         "title": "{{&alert_title}}",
+                         "title_link": "{{&alert_app_url}}#/dashboard/alerts/definitions?switchToAccountId={{&account_id}}",
+                         "pretext": "An alert has been triggered due to an event in your {{&account_name}} account.",
+                         "text": "{{&alert_description}}",
+                         "footer": "{{&alert_timeframe_start}} to {{&alert_timeframe_end}} (UTC)",
+                         "color": "#008ab1"
+                       },
+                       {
+                         "color": "#008ab1",
+                         "fields": [
+                           {
+                             "title": "{{^alert_event_image}}Alert event samples{{/alert_event_image}}",
+                             "value": "{{^alert_event_image}}{{^alert_event_samples}}No event samples available{{/alert_event_samples}}{{&alert_event_samples}}{{/alert_event_image}}",
+                             "short": false
+                           }
+                         ],
+                         "image_url": "{{&alert_event_image}}"
+                       },
+                       {
+                         "fields": [
+                           {
+                             "value": "{{#alert_event_html}}<{{&alert_event_html}}|Open full view>{{/alert_event_html}}",
+                             "short": false
+                           },
+                           {
+                             "value": "<{{&alert_app_url}}#/dashboard/alerts/view-alert-in-kibana?eventTimestamp={{&alert_event_timestamp}}&timeRangeInMinutes={{&alert_time_range_in_millis}}&alertDefinitionId={{&alert_definition_id}}&switchToAccountId={{&account_id}}|View in Kibana>",
+                             "short": false
+                           }
+                         ],
+                         "color": "#008ab1"
+                       }
+                     ]
+                   }
+                 },
+                 "internal_type": "HTTP"
+               }
+             ],
+             "suppressNotificationInMinutes": 60,
+             "timelessIndex": null
+           }
+         },
+         "lastUpdatedOn": null
+       }
+```
