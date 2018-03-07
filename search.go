@@ -80,12 +80,12 @@ type SearchSource struct {
 	Filter       []*SearchFilter `json:"filter"`
 }
 
-type searchQuery600 struct {
+type SearchQuery600 struct {
 	Query    string `json:"query"`
 	Language string `json:"language"`
 }
 
-type searchQuery553 struct {
+type SearchQuery553 struct {
 	QueryString *searchQueryString `json:"query_string"`
 }
 
@@ -142,14 +142,14 @@ type SearchSourceBuilder interface {
 type searchSourceBuilder600 struct {
 	indexId      string
 	highlightAll bool
-	query        *searchQuery600
+	query        *SearchQuery600
 	filters      []*SearchFilter
 }
 
 type searchSourceBuilder553 struct {
 	indexId      string
 	highlightAll bool
-	query        *searchQuery553
+	query        *SearchQuery553
 	filters      []*SearchFilter
 }
 
@@ -355,7 +355,7 @@ func (builder *searchSourceBuilder600) WithIndexId(indexId string) SearchSourceB
 }
 
 func (builder *searchSourceBuilder600) WithQuery(query string) SearchSourceBuilder {
-	builder.query = &searchQuery600{Query: query, Language: "lucene"}
+	builder.query = &SearchQuery600{Query: query, Language: "lucene"}
 	return builder
 }
 
@@ -384,7 +384,7 @@ func (builder *searchSourceBuilder553) WithIndexId(indexId string) SearchSourceB
 }
 
 func (builder *searchSourceBuilder553) WithQuery(query string) SearchSourceBuilder {
-	builder.query = &searchQuery553{
+	builder.query = &SearchQuery553{
 		QueryString: &searchQueryString{
 			Query:   query,
 			Analyze: true,
