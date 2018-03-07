@@ -10,10 +10,11 @@ import (
 func Test_DashboardCreateFromSavedSearch(t *testing.T) {
 	client := DefaultTestKibanaClient()
 
-	searchRequest, _, err := createSearchRequest(client, t)
+	searchClient := client.Search()
+	searchRequest, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
 	assert.Nil(t, err)
-	searchResponse, err := client.Search().Create(searchRequest)
-	defer client.Search().Delete(searchResponse.Id)
+	searchResponse, err := searchClient.Create(searchRequest)
+	defer searchClient.Delete(searchResponse.Id)
 	assert.Nil(t, err)
 
 	visualizationApi := client.Visualization()

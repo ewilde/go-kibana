@@ -9,8 +9,9 @@ import (
 
 func Test_SearchCreate(t *testing.T) {
 	client := DefaultTestKibanaClient()
+	searchApi := client.Search()
 
-	requestSearch, err := NewSearchSourceBuilder().
+	requestSearch, err := searchApi.NewSearchSource().
 		WithIndexId(client.Config.DefaultIndexId).
 		WithFilter(&SearchFilter{
 			Query: &SearchFilterQuery{
@@ -48,7 +49,6 @@ func Test_SearchCreate(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	searchApi := client.Search()
 	response, err := searchApi.Create(request)
 	defer searchApi.Delete(response.Id)
 
@@ -77,10 +77,68 @@ func Test_SearchCreate(t *testing.T) {
 	assert.Equal(t, requestSearch.Filter[0].Meta.Params.Type, responseSearch.Filter[0].Meta.Params.Type)
 }
 
+func Test_SearchCreate_with_exists_field(t *testing.T) {
+	client := DefaultTestKibanaClient()
+	searchApi := client.Search()
+
+	requestSearch, err := searchApi.NewSearchSource().
+		WithIndexId(client.Config.DefaultIndexId).
+		WithFilter(&SearchFilter{
+			Exists: &SearchFilterExists{
+				Field: "geo.ip",
+			},
+			Meta: &SearchFilterMetaData{
+				Index:    client.Config.DefaultIndexId,
+				Negate:   false,
+				Disabled: false,
+				Type:     "exists",
+				Key:      "geo.ip",
+				Value:    "exists",
+			},
+		}).
+		Build()
+
+	assert.Nil(t, err)
+
+	request, err := NewSearchRequestBuilder().
+		WithTitle("Geography filter on china").
+		WithDisplayColumns([]string{"_source"}).
+		WithSortColumns([]string{"@timestamp"}, Descending).
+		WithSearchSource(requestSearch).
+		Build()
+
+	assert.Nil(t, err)
+
+	response, err := searchApi.Create(request)
+	defer searchApi.Delete(response.Id)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
+	assert.Equal(t, request.Attributes.Columns, response.Attributes.Columns)
+	assert.Equal(t, request.Attributes.Sort, response.Attributes.Sort)
+	assert.NotEmpty(t, request.Attributes.KibanaSavedObjectMeta.SearchSourceJSON)
+
+	responseSearch := &SearchSource{}
+	json.Unmarshal([]byte(response.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
+	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
+
+	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
+	assert.Equal(t, requestSearch.Filter[0].Exists.Field, responseSearch.Filter[0].Exists.Field)
+
+	assert.Equal(t, requestSearch.Filter[0].Meta.Type, responseSearch.Filter[0].Meta.Type)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Key, responseSearch.Filter[0].Meta.Key)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Alias, responseSearch.Filter[0].Meta.Alias)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Disabled, responseSearch.Filter[0].Meta.Disabled)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Negate, responseSearch.Filter[0].Meta.Negate)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Index, responseSearch.Filter[0].Meta.Index)
+}
+
 func Test_SearchCreate_with_two_filters(t *testing.T) {
 	client := DefaultTestKibanaClient()
 
-	requestSearch, err := NewSearchSourceBuilder().
+	searchApi := client.Search()
+	requestSearch, err := searchApi.NewSearchSource().
 		WithIndexId(client.Config.DefaultIndexId).
 		WithFilter(&SearchFilter{
 			Query: &SearchFilterQuery{
@@ -115,7 +173,6 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	searchApi := client.Search()
 	response, err := searchApi.Create(request)
 	defer searchApi.Delete(response.Id)
 
@@ -136,14 +193,50 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 	assert.Equal(t, requestSearch.Filter[1].Query.Match["@tags"].Type, responseSearch.Filter[1].Query.Match["@tags"].Type)
 }
 
-func Test_SearchRead(t *testing.T) {
+func Test_SearchCreate_with_query(t *testing.T) {
 	client := DefaultTestKibanaClient()
+	searchApi := client.Search()
 
-	request, requestSearch, err := createSearchRequest(client, t)
+	requestSearch, err := searchApi.NewSearchSource().
+		WithIndexId(client.Config.DefaultIndexId).
+		WithQuery("geo.src:china").
+		Build()
 
 	assert.Nil(t, err)
 
+	request, err := NewSearchRequestBuilder().
+		WithTitle("Geography search on china with errors").
+		WithDisplayColumns([]string{"_source"}).
+		WithSortColumns([]string{"@timestamp"}, Descending).
+		WithSearchSource(requestSearch).
+		Build()
+
+	assert.Nil(t, err)
+
+	response, err := searchApi.Create(request)
+	defer searchApi.Delete(response.Id)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
+	assert.Equal(t, request.Attributes.Columns, response.Attributes.Columns)
+	assert.Equal(t, request.Attributes.Sort, response.Attributes.Sort)
+	assert.NotEmpty(t, request.Attributes.KibanaSavedObjectMeta.SearchSourceJSON)
+
+	responseSearch := &SearchSource{}
+	json.Unmarshal([]byte(response.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
+	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
+	assert.NotNil(t, responseSearch.Query)
+}
+
+func Test_SearchRead(t *testing.T) {
+	client := DefaultTestKibanaClient()
 	searchClient := client.Search()
+
+	request, requestSearch, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
+
+	assert.Nil(t, err)
+
 	createdSearch, err := searchClient.Create(request)
 	defer searchClient.Delete(createdSearch.Id)
 	assert.Nil(t, err, "Error creating search")
@@ -183,10 +276,10 @@ func Test_SearchRead_Unknown_Search_Returns_404(t *testing.T) {
 
 func Test_SearchUpdate(t *testing.T) {
 	client := DefaultTestKibanaClient()
-
-	request, _, err := createSearchRequest(client, t)
-	assert.Nil(t, err)
 	searchClient := client.Search()
+
+	request, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
+	assert.Nil(t, err)
 	search, err := searchClient.Create(request)
 	assert.Nil(t, err)
 	defer func() {
@@ -202,22 +295,23 @@ func Test_SearchUpdate(t *testing.T) {
 
 func Test_SearchDelete(t *testing.T) {
 	client := DefaultTestKibanaClient()
+	searchClient := client.Search()
 
-	request, _, err := createSearchRequest(client, t)
+	request, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
 	assert.Nil(t, err)
-	response, err := client.Search().Create(request)
+	response, err := searchClient.Create(request)
 	assert.Nil(t, err)
 
-	err = client.Search().Delete(response.Id)
+	err = searchClient.Delete(response.Id)
 	assert.Nil(t, err, "Delete returned error:%+v", err)
 
-	response, err = client.Search().GetById(response.Id)
+	response, err = searchClient.GetById(response.Id)
 	assert.Nil(t, response, "Response should be nil after being deleted")
 }
 
-func createSearchRequest(client *KibanaClient, t *testing.T) (*CreateSearchRequest, *SearchSource, error) {
-	requestSearch, err := NewSearchSourceBuilder().
-		WithIndexId(client.Config.DefaultIndexId).
+func createSearchRequest(factory SearchSourceBuilderFactory, indexId string, t *testing.T) (*CreateSearchRequest, *SearchSource, error) {
+	requestSearch, err := factory.NewSearchSource().
+		WithIndexId(indexId).
 		WithFilter(&SearchFilter{
 			Query: &SearchFilterQuery{
 				Match: map[string]*SearchFilterQueryAttributes{

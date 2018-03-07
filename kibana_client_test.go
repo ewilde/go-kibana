@@ -21,11 +21,11 @@ func Test_Change_account(t *testing.T) {
 
 	// 1. create a saved search using the default account
 	client := DefaultTestKibanaClient()
+	searchClient := client.Search()
 
-	request, _, err := createSearchRequest(client, t)
+	request, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
 	assert.Nil(t, err)
 
-	searchClient := client.Search()
 	searchFromAccount1, err := searchClient.Create(request)
 	assert.Nil(t, err)
 
