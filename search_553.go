@@ -98,7 +98,7 @@ func (api *searchClient553) GetById(id string) (*Search, error) {
 	}
 
 	if response.StatusCode >= 300 {
-		if api.config.KibanaType == KibanaTypeLogzio && response.StatusCode == 400 { // bug in their api reports missing search as bad request
+		if api.config.KibanaType == KibanaTypeLogzio && response.StatusCode >= 400 { // bug in their api reports missing search as bad request or server error
 			response.StatusCode = 404
 		}
 
