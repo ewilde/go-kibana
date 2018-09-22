@@ -3,6 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
+			"path": "-v",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "9NFR6RG8H2fNyKHscGmuGLQhRm4=",
 			"path": "github.com/Azure/go-ansiterm",
 			"revision": "d6e3b3328b783f23731bc4d058875b0371ff8109",
@@ -225,6 +229,12 @@
 			"revisionTime": "2017-01-11T10:11:55Z"
 		},
 		{
+			"checksumSHA1": "k1MUPpAbtF6JiyP80WTId1tX/Ns=",
+			"path": "github.com/mcuadros/go-version",
+			"revision": "6d5863ca60fa6fe914b5fd43ed8533d7567c5b0b",
+			"revisionTime": "2018-06-11T08:56:57Z"
+		},
+		{
 			"checksumSHA1": "CxNwJP++vjUAyy3bbJnNss1Il9Q=",
 			"path": "github.com/moul/http2curl",
 			"revision": "9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d",
@@ -278,12 +288,12 @@
 			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
 			"revisionTime": "2016-01-10T10:55:54Z"
 		},
-        {
-            "checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
-            "path": "github.com/satori/go.uuid",
-            "revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
-            "revisionTime": "2016-09-27T10:08:44Z"
-        },
+		{
+			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "b061729afc07e77a8aa4fad0a2fd840958f1942a",
+			"revisionTime": "2016-09-27T10:08:44Z"
+		},
 		{
 			"checksumSHA1": "pOsyzLxA9jL375TDmbDdsgiMPl8=",
 			"path": "github.com/sirupsen/logrus",
