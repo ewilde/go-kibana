@@ -67,7 +67,7 @@ func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) e
 
 	response, body, errs = request.Post(fmt.Sprintf("%s/login/jwt", auth.LogzUri)).
 		Set("x-logz-csrf-token", csrfToken).
-		Set("cookie", "Logzio-Csrf="+csrfToken).
+		Set("cookie", fmt.Sprintf("Logzio-Csrf=%s", csrfToken)).
 		Send(fmt.Sprintf(`{
   "jwt": "%s"
 }`, authResponse.IdTokens)).
