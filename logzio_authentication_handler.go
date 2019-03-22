@@ -21,13 +21,14 @@ func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) e
 		End()
 
 	cookieHeader := response.Header.Get("Set-Cookie")
-	cookieRegEx, err := regexp.Compile("Logzio-Csrf=([^;]+)")
+	csrfCookieRegEx := regexp.MustCompile("Logzio-Csrf=([^;]+)")
 
-	if err != nil {
+	cookieRegExMatches := csrfCookieRegEx.FindStringSubmatch(cookieHeader)
+
+	if len(cookieRegExMatches) < 2 {
 		log.Fatal("Could not retrieve CSRF token from logz.io cookie.")
 	}
 
-	cookieRegExMatches := cookieRegEx.FindStringSubmatch(cookieHeader)
 	csrfToken := cookieRegExMatches[1]
 
 	mfaCode := ""
