@@ -307,6 +307,12 @@
 			"revisionTime": "2017-08-14T20:04:35Z"
 		},
 		{
+			"checksumSHA1": "uN0rd74J8nc4+FnuaUu+lvWMtrg=",
+			"path": "github.com/xlzd/gotp",
+			"revision": "c8557ba2c11930b3069b31bfd80f38cc774cc68a",
+			"revisionTime": "2018-10-30T02:21:05Z"
+		},
+		{
 			"checksumSHA1": "4vi1yAnCfc+roJdMn/VZeHxlHj0=",
 			"path": "golang.org/x/crypto/ssh/terminal",
 			"revision": "b080dc9a8c480b08e698fb1219160d598526310f",

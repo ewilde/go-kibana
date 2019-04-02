@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/parnurzeal/gorequest"
+	"github.com/xlzd/gotp"
+	"log"
+	"regexp"
 )
 
 func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) error {
@@ -14,7 +17,27 @@ func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) e
 	}
 
 	request := gorequest.New()
-	response, body, errs := request.Post(fmt.Sprintf("%s/oauth/ro", auth.Auth0Uri)).
+	response, body, errs := request.Get(fmt.Sprintf("%s/#/login", auth.LogzUri)).
+		End()
+
+	cookieHeader := response.Header.Get("Set-Cookie")
+	csrfCookieRegEx := regexp.MustCompile("Logzio-Csrf=([^;]+)")
+
+	cookieRegExMatches := csrfCookieRegEx.FindStringSubmatch(cookieHeader)
+
+	if len(cookieRegExMatches) < 2 {
+		log.Fatal("Could not retrieve CSRF token from logz.io cookie.")
+	}
+
+	csrfToken := cookieRegExMatches[1]
+
+	mfaCode := ""
+	if auth.MfaSecret != "" {
+		mfaCode = gotp.NewDefaultTOTP(auth.MfaSecret).Now()
+	}
+
+	request = gorequest.New()
+	response, body, errs = request.Post(fmt.Sprintf("%s/oauth/ro", auth.Auth0Uri)).
 		Set("kbn-version", DefaultKibanaVersion553).
 		Set("Content-Type", "application/x-www-form-urlencoded").
 		Type("form").
@@ -25,8 +48,9 @@ func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) e
   "username": "%s",
   "password": "%s",
   "grant_type": "password",
-  "client_id": "%s"
-}`, auth.UserName, auth.Password, auth.ClientId)).
+  "client_id": "%s",
+  "mfa_code": "%s"
+}`, auth.UserName, auth.Password, auth.ClientId, mfaCode)).
 		End()
 
 	if errs != nil {
@@ -43,6 +67,8 @@ func (auth *LogzAuthenticationHandler) Initialize(agent *gorequest.SuperAgent) e
 	}
 
 	response, body, errs = request.Post(fmt.Sprintf("%s/login/jwt", auth.LogzUri)).
+		Set("x-logz-csrf-token", csrfToken).
+		Set("cookie", fmt.Sprintf("Logzio-Csrf=%s", csrfToken)).
 		Send(fmt.Sprintf(`{
   "jwt": "%s"
 }`, authResponse.IdTokens)).
