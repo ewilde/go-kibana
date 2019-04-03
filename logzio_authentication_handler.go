@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"github.com/parnurzeal/gorequest"
 	"github.com/xlzd/gotp"
+	"log"
 	"regexp"
 	"time"
-	"log"
 )
 
 var mfaCodeExpiredError = errors.New("the mfa code sent is expired")
@@ -74,7 +74,6 @@ func (auth *LogzAuthenticationHandler) ChangeAccount(accountId string, agent *Ht
 	auth.sessionToken = responseMap["sessionToken"].(string)
 	return nil
 }
-
 
 func (auth *LogzAuthenticationHandler) getCSRFToken() (string, error) {
 	request := gorequest.New()
