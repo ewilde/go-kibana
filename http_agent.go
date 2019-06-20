@@ -126,6 +126,5 @@ func (authClient *HttpAgent) clone() *HttpAgent {
 func (authClient *HttpAgent) createSuperAgent() *gorequest.SuperAgent {
 	superAgent := gorequest.New()
 	superAgent.Debug = authClient.config.Debug
-
 	return superAgent
 }
