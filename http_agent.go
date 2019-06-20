@@ -2,12 +2,14 @@ package kibana
 
 import (
 	"github.com/parnurzeal/gorequest"
+	"log"
 )
 
 type HttpAgent struct {
 	client      *gorequest.SuperAgent
 	authHandler AuthenticationHandler
 	config      *Config
+	logger      *log.Logger
 }
 
 type AuthenticationHandler interface {
@@ -98,6 +100,11 @@ func (authClient *HttpAgent) End(callback ...func(response gorequest.Response, b
 	return authClient.client.End(callback...)
 }
 
+func (authClient *HttpAgent) SetLogger(logger *log.Logger) *HttpAgent {
+	authClient.logger = logger
+	return authClient
+}
+
 func NewBasicAuthentication(userName string, password string) *BasicAuthenticationHandler {
 	return &BasicAuthenticationHandler{userName: userName, password: password}
 }
@@ -126,6 +133,6 @@ func (authClient *HttpAgent) clone() *HttpAgent {
 func (authClient *HttpAgent) createSuperAgent() *gorequest.SuperAgent {
 	superAgent := gorequest.New()
 	superAgent.Debug = authClient.config.Debug
-
+	superAgent.SetLogger(authClient.logger)
 	return superAgent
 }

@@ -3,6 +3,7 @@ package kibana
 import (
 	"fmt"
 	"github.com/google/go-querystring/query"
+	"log"
 	"net/url"
 	"os"
 	"reflect"
@@ -236,6 +237,11 @@ func (kibanaClient *KibanaClient) IndexPattern() IndexPatternClient {
 
 func (kibanaClient *KibanaClient) SavedObjects() SavedObjectsClient {
 	return getSavedObjectsClientFromVersion(kibanaClient.Config.KibanaVersion, kibanaClient)
+}
+
+func (kibanaClient *KibanaClient) SetLogger(logger *log.Logger) *KibanaClient {
+	kibanaClient.client.SetLogger(logger)
+	return kibanaClient
 }
 
 func (config *Config) BuildFullPath(format string, a ...interface{}) string {
