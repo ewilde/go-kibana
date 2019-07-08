@@ -1,9 +1,11 @@
 package kibana
 
 import (
-	"github.com/parnurzeal/gorequest"
+	"crypto/tls"
 	"log"
 	"os"
+
+	"github.com/parnurzeal/gorequest"
 )
 
 type HttpAgent struct {
@@ -137,5 +139,8 @@ func (authClient *HttpAgent) createSuperAgent() *gorequest.SuperAgent {
 	superAgent := gorequest.New()
 	superAgent.Debug = authClient.config.Debug
 	superAgent.SetLogger(authClient.logger)
+	if authClient.config.Insecure {
+		superAgent.TLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+	}
 	return superAgent
 }
