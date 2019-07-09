@@ -68,7 +68,7 @@ type KibanaClient struct {
 type createResourceResult553 struct {
 	Id      string `json:"_id"`
 	Type    string `json:"_type"`
-	Version int    `json:"_version"`
+	Version string `json:"_version"`
 }
 
 var indexClientFromVersion = map[string]func(kibanaClient *KibanaClient) IndexPatternClient{
