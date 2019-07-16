@@ -3,6 +3,7 @@ package kibana
 import (
 	"github.com/parnurzeal/gorequest"
 	"log"
+	"os"
 )
 
 type HttpAgent struct {
@@ -33,6 +34,7 @@ type LogzAuthenticationHandler struct {
 	ClientId     string
 	sessionToken string
 	MfaSecret    string
+	csrfToken    string
 }
 
 type Auth0Response struct {
@@ -45,6 +47,7 @@ func NewHttpAgent(config *Config, authHandler AuthenticationHandler) *HttpAgent 
 	return &HttpAgent{
 		authHandler: authHandler,
 		config:      config,
+		logger:      log.New(os.Stderr, "", log.LstdFlags),
 	}
 }
 

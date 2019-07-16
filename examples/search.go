@@ -8,7 +8,7 @@ func createSearch() (*kibana.Search, error) {
 	client := kibana.NewClient(kibana.NewDefaultConfig())
 	client.Config.KibanaVersion = kibana.DefaultKibanaVersion6
 
-	requestSearch, _ := kibana.NewSearchSourceBuilder().
+	requestSearch, _ := client.Search().NewSearchSource().
 		WithIndexId(client.Config.DefaultIndexId).
 		WithFilter(&kibana.SearchFilter{
 			Query: &kibana.SearchFilterQuery{
