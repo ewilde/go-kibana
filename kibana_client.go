@@ -23,6 +23,7 @@ const EnvLogzMfaSecret = "LOGZ_MFA_SECRET"
 const DefaultKibanaUri = "http://localhost:5601"
 const DefaultElasticSearchPath = "/es_admin/.kibana"
 const DefaultKibanaVersion6 = "6.0.0"
+const DefaultLogzioVersion = "6.3.2"
 const DefaultKibanaVersion553 = "5.5.3"
 const DefaultKibanaVersion = DefaultKibanaVersion6
 const DefaultKibanaIndexId = "logstash-*"

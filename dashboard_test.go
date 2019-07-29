@@ -14,8 +14,8 @@ func Test_DashboardCreateFromSavedSearch(t *testing.T) {
 	searchRequest, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
 	assert.Nil(t, err)
 	searchResponse, err := searchClient.Create(searchRequest)
-	defer searchClient.Delete(searchResponse.Id)
 	assert.Nil(t, err)
+	defer searchClient.Delete(searchResponse.Id)
 
 	visualizationApi := client.Visualization()
 
