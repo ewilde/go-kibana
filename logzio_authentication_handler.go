@@ -80,7 +80,7 @@ func (auth *LogzAuthenticationHandler) initializeWithAuth0(agent *gorequest.Supe
 	}
 
 	if response.StatusCode >= 400 {
-		return fmt.Errorf("error logging in. %s", string(body))
+		return fmt.Errorf("error logging in (%d). %s", response.StatusCode, string(body))
 	}
 
 	jwtResponse := map[string]interface{}{}
@@ -104,10 +104,16 @@ func (auth *LogzAuthenticationHandler) initializeWithMFA(agent *gorequest.SuperA
 	mfaCode, secondsLeftForMfaToExpire := auth.getMfaCodeWithExpiry()
 	sessionToken, err := auth.getLogzioSessionToken(mfaCode)
 
+	// Attempt regeneration if possible
 	if err == mfaCodeExpiredError && secondsLeftForMfaToExpire < 5 {
 		log.Print("The mfa code was too close to expiry, so we re-generate and try again")
 		mfaCode, secondsLeftForMfaToExpire = auth.getMfaCodeWithExpiry()
 		sessionToken, err = auth.getLogzioSessionToken(mfaCode)
+	}
+
+	// If we're still failing, we cannot proceed
+	if err != nil {
+		return fmt.Errorf("Error getting MFA code: %s", err)
 	}
 
 	response, body, errs := request.Post(fmt.Sprintf("%s/login/jwt", auth.LogzUri)).
@@ -119,7 +125,7 @@ func (auth *LogzAuthenticationHandler) initializeWithMFA(agent *gorequest.SuperA
 		End()
 
 	if response.StatusCode >= 400 {
-		return fmt.Errorf("error logging in. %s", string(body))
+		return fmt.Errorf("error logging in (%d). %s", response.StatusCode, string(body))
 	}
 
 	if errs != nil {
