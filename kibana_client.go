@@ -2,12 +2,13 @@ package kibana
 
 import (
 	"fmt"
-	"github.com/google/go-querystring/query"
 	"log"
 	"net/url"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/google/go-querystring/query"
 )
 
 const EnvElasticSearchPath = "ELASTIC_SEARCH_PATH"
@@ -59,6 +60,7 @@ type Config struct {
 	KibanaBaseUri     string
 	KibanaVersion     string
 	KibanaType        KibanaType
+	Insecure          bool
 }
 
 type KibanaClient struct {
@@ -168,6 +170,7 @@ func NewDefaultConfig() *Config {
 		KibanaBaseUri:     DefaultKibanaUri,
 		KibanaVersion:     DefaultKibanaVersion,
 		KibanaType:        KibanaTypeVanilla,
+		Insecure:          false,
 	}
 
 	if value := os.Getenv(EnvElasticSearchPath); value != "" {
