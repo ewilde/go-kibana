@@ -85,6 +85,9 @@ func (auth *LogzAuthenticationHandler) initializeWithAuth0(agent *gorequest.Supe
 	  "client_id": "%s"
 	}`, auth.UserName, auth.Password, auth.ClientId)
 	authResponse, err := auth.auth0RO(form)
+
+	fmt.Printf("Username: %s", auth.UserName)
+
 	if err != nil {
 		return err
 	}
