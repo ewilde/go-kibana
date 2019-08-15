@@ -40,9 +40,14 @@ type LogzAuthenticationHandler struct {
 }
 
 type Auth0Response struct {
-	IdTokens    string `json:"id_token"`
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
+	IdTokens         string `json:"id_token"`
+	AccessToken      string `json:"access_token"`
+	TokenType        string `json:"token_type"`
+	Error            string `json:"error"`
+	ErrorDescription string `json:"description"`
+}
+
+type Auth0Error struct {
 }
 
 func NewHttpAgent(config *Config, authHandler AuthenticationHandler) *HttpAgent {
