@@ -57,6 +57,8 @@ func (auth *LogzAuthenticationHandler) auth0RO(form string) (response *Auth0Resp
 			error += fmt.Sprintf(", Description: %s", authResponse.ErrorDescription)
 		}
 
+		error += fmt.Sprintf("\nResponse Body: %s", body)
+
 		// We still return authResponse here in case the caller wants to access the Auth0 errors
 		//	e.g. to retry on MFA expiry
 		return authResponse, errors.New(error)
