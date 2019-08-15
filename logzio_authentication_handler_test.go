@@ -1,10 +1,11 @@
 package kibana
 
 import (
-	"github.com/parnurzeal/gorequest"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/parnurzeal/gorequest"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_LogzAuthentication_handler(t *testing.T) {
@@ -15,7 +16,10 @@ func Test_LogzAuthentication_handler(t *testing.T) {
 
 	handler := createLogzAuthenticationHandler()
 
-	handler.Initialize(gorequest.New())
+	err := handler.Initialize(gorequest.New())
+	if err != nil {
+		t.Fatalf("Failed to initialize auth handler: %s", err)
+	}
 
 	assert.NotEmpty(t, handler.sessionToken, "Session token should not be empty")
 }
