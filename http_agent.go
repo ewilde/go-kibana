@@ -47,9 +47,6 @@ type Auth0Response struct {
 	ErrorDescription string `json:"description"`
 }
 
-type Auth0Error struct {
-}
-
 func NewHttpAgent(config *Config, authHandler AuthenticationHandler) *HttpAgent {
 	return &HttpAgent{
 		authHandler: authHandler,
