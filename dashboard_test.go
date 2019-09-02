@@ -2,9 +2,10 @@ package kibana
 
 import (
 	"fmt"
-	"github.com/satori/go.uuid"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	uuid "github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_DashboardCreateFromSavedSearch(t *testing.T) {
@@ -24,11 +25,13 @@ func Test_DashboardCreateFromSavedSearch(t *testing.T) {
 		WithDescription("This visualization shows errors from china").
 		WithVisualizationState("{\"title\":\"test kong vis\",\"type\":\"area\",\"params\":{\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"@timestamp date ranges\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"area\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_range\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"ranges\":[{\"from\":\"now-1h\",\"to\":\"now\"}]}}],\"listeners\":{}}").
 		WithSavedSearchId(searchResponse.Id).
-		Build()
+		Build(client.Config.KibanaVersion)
 
 	assert.Nil(t, err)
 
 	visualizationResponse, err := visualizationApi.Create(visualizationRequest)
+	assert.Nil(t, err)
+
 	defer visualizationApi.Delete(visualizationResponse.Id)
 
 	dashboardApi := client.Dashboard()
@@ -38,12 +41,13 @@ func Test_DashboardCreateFromSavedSearch(t *testing.T) {
 		WithDescription("This dashboard shows errors from china").
 		WithPanelsJson(fmt.Sprintf("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"%s\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"%s\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]", visualizationResponse.Id, searchResponse.Id)).
 		WithOptionsJson("{\"darkTheme\":false}").
-		WithUiStateJson("{\"P-1\":{\"vis\":{\"defaultColors\":{\"0 - 50\":\"rgb(0,104,55)\",\"50 - 75\":\"rgb(255,255,190)\",\"75 - 100\":\"rgb(165,0,38)\"}}}}").
 		Build()
 
 	assert.Nil(t, err)
 
 	response, err := dashboardApi.Create(dashboardRequest)
+	assert.Nil(t, err)
+
 	defer dashboardApi.Delete(response.Id)
 
 	assert.Nil(t, err)
@@ -64,7 +68,6 @@ func Test_DashboardRead(t *testing.T) {
 		WithDescription("This dashboard shows errors from china").
 		WithPanelsJson("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"bc8a1970-175b-11e8-accb-65182aaf9591\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"aca8b340-175b-11e8-accb-65182aaf9591\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]").
 		WithOptionsJson("{\"darkTheme\":false}").
-		WithUiStateJson("{\"P-1\":{\"vis\":{\"defaultColors\":{\"0 - 50\":\"rgb(0,104,55)\",\"50 - 75\":\"rgb(255,255,190)\",\"75 - 100\":\"rgb(165,0,38)\"}}}}").
 		Build()
 
 	assert.Nil(t, err)
@@ -109,12 +112,12 @@ func Test_DashboardUpdate(t *testing.T) {
 		WithDescription("This dashboard shows errors from china").
 		WithPanelsJson("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"bc8a1970-175b-11e8-accb-65182aaf9591\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"aca8b340-175b-11e8-accb-65182aaf9591\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]").
 		WithOptionsJson("{\"darkTheme\":false}").
-		WithUiStateJson("{\"P-1\":{\"vis\":{\"defaultColors\":{\"0 - 50\":\"rgb(0,104,55)\",\"50 - 75\":\"rgb(255,255,190)\",\"75 - 100\":\"rgb(165,0,38)\"}}}}").
 		Build()
 
 	assert.Nil(t, err)
 
 	createdDashboard, err := dashboardApi.Create(request)
+	assert.Nil(t, err)
 	defer dashboardApi.Delete(createdDashboard.Id)
 	assert.Nil(t, err, "Error creating dashboard")
 
