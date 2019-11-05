@@ -28,6 +28,7 @@ const DefaultElasticSearchPath = "/es_admin/.kibana"
 const DefaultKibanaVersion6 = "6.0.0"
 const DefaultKibanaVersion7 = "7.3.1"
 const DefaultLogzioVersion = "6.3.2"
+const DefaultLogzioClientId = "kydHH8LqsLR6D6d2dlHTpPEdf0Bztz4c"
 const DefaultKibanaVersion553 = "5.5.3"
 const DefaultKibanaVersion = DefaultKibanaVersion6
 const DefaultKibanaIndexId = "logstash-*"
