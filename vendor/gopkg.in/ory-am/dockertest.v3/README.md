@@ -1,4 +1,4 @@
-# [ory.am](https://ory.am)/dockertest
+<h1 align="center"><img src="./docs/images/banner_dockertest.png" alt="ORY Dockertest"></h1>
 
 [![Build Status](https://travis-ci.org/ory/dockertest.svg)](https://travis-ci.org/ory/dockertest?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/ory/dockertest/badge.svg?branch=v3)](https://coveralls.io/github/ory/dockertest?branch=v3)
@@ -32,13 +32,13 @@ them for your tests.
 
 ## Installing and using Dockertest
 
-Using Dockertest is straightforward and simple. Check the [releases tab](https://github.com/ory-am/dockertest/releases)
+Using Dockertest is straightforward and simple. Check the [releases tab](https://github.com/ory/dockertest/releases)
 for available releases.
 
 To install dockertest, run
 
 ```
-go get gopkg.in/ory-am/dockertest.v3
+dep ensure -add github.com/ory/dockertest@v3.x.y
 ```
 
 ### Using Dockertest
@@ -49,7 +49,7 @@ package dockertest_test
 import (
 	"testing"
 	"log"
-	"gopkg.in/ory-am/dockertest.v3"
+	"github.com/ory/dockertest"
 	_ "github.com/go-sql-driver/mysql"
 	"database/sql"
 	"fmt"
@@ -124,4 +124,8 @@ Try cleaning up the images with [docker-cleanup-volumes](https://github.com/chad
 ### Removing old containers
 
 Sometimes container clean up fails. Check out
-[this stackoverflow question](http://stackoverflow.com/questions/21398087/how-to-delete-dockers-images) on how to fix this.
+[this stackoverflow question](http://stackoverflow.com/questions/21398087/how-to-delete-dockers-images) on how to fix this. You may also set an absolute lifetime on containers: 
+
+```go
+resource.Expire(60) // Tell docker to hard kill the container in 60 seconds
+```
