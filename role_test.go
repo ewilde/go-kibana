@@ -1,18 +1,11 @@
 package kibana
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func skipIfNotXpackSecurity(t *testing.T) {
-	_, useXpackSecurity := os.LookupEnv("USE_XPACK_SECURITY")
-	if !useXpackSecurity {
-		t.Skip("Skipping testing as we don't have xpack security")
-	}
-}
 func Test_RoleGet(t *testing.T) {
 	skipIfNotXpackSecurity(t)
 	client := DefaultTestKibanaClient()

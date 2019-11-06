@@ -143,3 +143,10 @@ func stopKibana(testContext *testContext) {
 func getContainerName(container *dockertest.Resource) string {
 	return strings.TrimPrefix(container.Container.Name, "/")
 }
+
+func skipIfNotXpackSecurity(t *testing.T) {
+	_, useXpackSecurity := os.LookupEnv("USE_XPACK_SECURITY")
+	if !useXpackSecurity {
+		t.Skip("Skipping testing as we don't have xpack security")
+	}
+}
