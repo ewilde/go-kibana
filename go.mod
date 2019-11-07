@@ -1,4 +1,4 @@
-module github.com/jfroche/go-kibana
+module github.com/ewilde/go-kibana
 
 go 1.12
 
