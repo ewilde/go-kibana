@@ -34,6 +34,7 @@ type VisualizationAttributes struct {
 	Version            int    `json:"version"`
 	VisualizationState string `json:"visState"`
 	SavedSearchId      string `json:"savedSearchId"`
+	SavedSearchRefName string `json:"savedSearchRefName"`
 }
 
 type VisualizationRequestBuilder struct {
@@ -41,6 +42,7 @@ type VisualizationRequestBuilder struct {
 	description        string
 	visualizationState string
 	savedSearchId      string
+	savedSearchRefName string
 }
 
 type visualizationClient600 struct {
@@ -84,6 +86,11 @@ func (builder *VisualizationRequestBuilder) WithSavedSearchId(savedSearchId stri
 	return builder
 }
 
+func (builder *VisualizationRequestBuilder) WithSavedSearchRefName(savedSearchRefName string) *VisualizationRequestBuilder {
+	builder.savedSearchRefName = savedSearchRefName
+	return builder
+}
+
 func (builder *VisualizationRequestBuilder) Build() (*CreateVisualizationRequest, error) {
 
 	return &CreateVisualizationRequest{
@@ -91,6 +98,7 @@ func (builder *VisualizationRequestBuilder) Build() (*CreateVisualizationRequest
 			Title:              builder.title,
 			Description:        builder.description,
 			SavedSearchId:      builder.savedSearchId,
+			SavedSearchRefName: builder.savedSearchRefName,
 			Version:            1,
 			VisualizationState: builder.visualizationState,
 		},
