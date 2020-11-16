@@ -179,9 +179,8 @@ func (auth *LogzAuthenticationHandler) ChangeAccount(accountId string, agent *Ht
 
 func (auth *LogzAuthenticationHandler) getCSRFToken() (string, error) {
 
-	url := fmt.Sprintf("%s/#/login", auth.LogzUri)
 	request := gorequest.New()
-	response, _, errs := request.Get(url).
+	response, _, errs := request.Get(fmt.Sprintf("%s/#/login", auth.LogzUri)).
 		End()
 
 	if len(errs) > 0 {
@@ -193,7 +192,6 @@ func (auth *LogzAuthenticationHandler) getCSRFToken() (string, error) {
 		return "", err
 	}
 
-	fmt.Printf("csrf token %s", csrfToken)
 	auth.csrfToken = csrfToken
 	return csrfToken, nil
 }
