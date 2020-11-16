@@ -205,7 +205,7 @@ var (
 
 func findCsrfTokenInCookies(response gorequest.Response) (string, error) {
 	for _, cookie := range response.Header["Set-Cookie"] {
-		token, err := findCsrfTokenInCookieUsingRegexp(cookie, csrfRegexps)
+		token, err := findCsrfTokenInCookieUsingRegexps(cookie, csrfRegexps)
 		if err == nil && len(token) > 0 {
 			return token, nil
 		}
@@ -213,7 +213,7 @@ func findCsrfTokenInCookies(response gorequest.Response) (string, error) {
 	return "", errors.New("could not retrieve CSRF token from logz.io cookie")
 }
 
-func findCsrfTokenInCookieUsingRegexp(cookie string, regexps []*regexp.Regexp) (string, error) {
+func findCsrfTokenInCookieUsingRegexps(cookie string, regexps []*regexp.Regexp) (string, error) {
 	for _, regexp := range regexps {
 		matches := regexp.FindStringSubmatch(cookie)
 		if len(matches) > 1 {
