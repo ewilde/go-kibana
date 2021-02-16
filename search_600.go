@@ -115,7 +115,7 @@ func (api *searchClient600) List() ([]*Search, error) {
 		if api.config.KibanaType == KibanaTypeLogzio && response.StatusCode >= 400 { // bug in their api reports missing search as bad request or server error
 			response.StatusCode = 404
 		}
-		return nil, NewError(response, body, "Could not fetch search")
+		return nil, NewError(response, body, "Could not list searches")
 	}
 	var listResp = struct {
 		SavedObjects []*Search `json:"saved_objects"`

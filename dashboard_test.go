@@ -103,6 +103,29 @@ func Test_DashboardRead_Unknown_Dashboard_Returns_404(t *testing.T) {
 	assert.Equal(t, 404, httpErr.Code)
 }
 
+func Test_DashboardList(t *testing.T) {
+	client := DefaultTestKibanaClient()
+	dashboardApi := client.Dashboard()
+
+	request, err := NewDashboardRequestBuilder().
+		WithTitle("China errors").
+		WithDescription("This dashboard shows errors from china").
+		WithPanelsJson("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"bc8a1970-175b-11e8-accb-65182aaf9591\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"aca8b340-175b-11e8-accb-65182aaf9591\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]").
+		WithOptionsJson("{\"darkTheme\":false}").
+		Build()
+
+	assert.Nil(t, err)
+
+	createdDashboard, err := dashboardApi.Create(request)
+	assert.Nil(t, err, "Error creating dashboard")
+	defer dashboardApi.Delete(createdDashboard.Id)
+
+	listDashboard, err := dashboardApi.List()
+	assert.Nil(t, err, "Error listing dashboards")
+	assert.NotNil(t, listDashboard, "Response from list dashboard is null")
+	assert.NotEmpty(t, listDashboard, "Response from list dashboard is empty")
+}
+
 func Test_DashboardUpdate(t *testing.T) {
 	client := DefaultTestKibanaClient()
 	dashboardApi := client.Dashboard()
