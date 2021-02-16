@@ -11,6 +11,7 @@ import (
 type VisualizationClient interface {
 	Create(request *CreateVisualizationRequest) (*Visualization, error)
 	GetById(id string) (*Visualization, error)
+	List() ([]*Visualization, error)
 	Update(id string, request *UpdateVisualizationRequest) (*Visualization, error)
 	Delete(id string) error
 }
@@ -193,6 +194,35 @@ func (api *visualizationClient600) GetById(id string) (*Visualization, error) {
 	return createResponse, nil
 }
 
+func (api *visualizationClient600) List() ([]*Visualization, error) {
+	response, body, err := api.client.
+		Get(api.config.KibanaBaseUri+savedObjectsPath+"_find?type=visualization&per_page=9999").
+		Set("kbn-version", api.config.KibanaVersion).
+		End()
+
+	if err != nil {
+		return nil, err[0]
+	}
+
+	if response.StatusCode >= 300 {
+		if api.config.KibanaType == KibanaTypeLogzio && response.StatusCode >= 400 { // bug in their api reports missing visualization as bad request / server error
+			response.StatusCode = 404
+		}
+		return nil, NewError(response, body, "Could not fetch visualization")
+	}
+
+	var listResp = struct {
+		SavedObjects []*Visualization `json:"saved_objects"`
+	}{}
+	var listErr error
+	listErr = json.Unmarshal([]byte(body), &listResp)
+	if listErr != nil {
+		return nil, fmt.Errorf("could not parse fields from list visualization response, error: %v", listErr)
+	}
+
+	return listResp.SavedObjects, nil
+}
+
 func (api *visualizationClient600) Update(id string, request *UpdateVisualizationRequest) (*Visualization, error) {
 	response, body, err := api.client.
 		Post(api.config.KibanaBaseUri+savedObjectsPath+"visualization/"+id+"?overwrite=true").
@@ -285,6 +315,42 @@ func (api *visualizationClient553) GetById(id string) (*Visualization, error) {
 		Type:       createResponse.Type,
 		Attributes: createResponse.Source,
 	}, nil
+}
+
+func (api *visualizationClient553) List() ([]*Visualization, error) {
+	response, body, err := api.client.
+		Get(api.config.BuildFullPath("/%s", "visualization")).
+		Set("kbn-version", api.config.KibanaVersion).
+		End()
+
+	if err != nil {
+		return nil, err[0]
+	}
+
+	if response.StatusCode >= 300 {
+		if api.config.KibanaType == KibanaTypeLogzio && response.StatusCode >= 400 { // bug in their api reports missing dashboard as bad request / server error
+			response.StatusCode = 404
+		}
+
+		return nil, NewError(response, body, "Could not fetch visualization")
+	}
+
+	listResp := make([]*visualizationReadResult553, 0)
+	var listErr error
+	listErr = json.Unmarshal([]byte(body), &listResp)
+	if listErr != nil {
+		return nil, fmt.Errorf("could not parse fields from visualization list response, error: %v", listErr)
+	}
+
+	results := make([]*Visualization, len(listResp))
+	for i := range listResp {
+		results[i].Id = listResp[i].Id
+		results[i].Version = listResp[i].Version
+		results[i].Type = listResp[i].Type
+		results[i].Attributes = listResp[i].Source
+	}
+
+	return results, nil
 }
 
 func (api *visualizationClient553) Update(id string, request *UpdateVisualizationRequest) (*Visualization, error) {

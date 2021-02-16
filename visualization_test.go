@@ -75,6 +75,29 @@ func Test_VisualizationRead_Unknown_Visualization_Returns_404(t *testing.T) {
 	assert.Equal(t, 404, httpErr.Code)
 }
 
+func Test_VisualizationList(t *testing.T) {
+	client := DefaultTestKibanaClient()
+	visualizationApi := client.Visualization()
+
+	request, err := NewVisualizationRequestBuilder().
+		WithTitle("China errors").
+		WithDescription("This visualization shows errors from china").
+		WithVisualizationState("{\"title\":\"test kong vis\",\"type\":\"area\",\"params\":{\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"bottom\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"truncate\":100},\"title\":{\"text\":\"@timestamp date ranges\"}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"left\",\"show\":true,\"style\":{},\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":100},\"title\":{\"text\":\"Count\"}}],\"seriesParams\":[{\"show\":\"true\",\"type\":\"area\",\"mode\":\"stacked\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"drawLinesBetweenPoints\":true,\"showCircles\":true,\"interpolate\":\"linear\",\"valueAxis\":\"ValueAxis-1\"}],\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"schema\":\"metric\",\"params\":{}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_range\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"ranges\":[{\"from\":\"now-1h\",\"to\":\"now\"}]}}],\"listeners\":{}}").
+		WithSavedSearchId("123").
+		Build(client.Config.KibanaVersion)
+
+	assert.Nil(t, err)
+
+	createdVisualization, err := visualizationApi.Create(request)
+	defer visualizationApi.Delete(createdVisualization.Id)
+	assert.Nil(t, err, "Error creating visualization")
+
+	listVisualization, err := visualizationApi.List()
+	assert.Nil(t, err, "Error listing visualizations")
+	assert.NotNil(t, listVisualization, "Response from list visualization is null")
+	assert.NotEmpty(t, listVisualization, "Response from list visualization is empty")
+}
+
 func Test_VisualizationUpdate(t *testing.T) {
 	client := DefaultTestKibanaClient()
 	visualizationApi := client.Visualization()
