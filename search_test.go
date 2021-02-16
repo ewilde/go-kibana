@@ -2,9 +2,10 @@ package kibana
 
 import (
 	"encoding/json"
-	"github.com/satori/go.uuid"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	uuid "github.com/satori/go.uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_SearchCreate(t *testing.T) {
@@ -272,6 +273,23 @@ func Test_SearchRead_Unknown_Search_Returns_404(t *testing.T) {
 	}
 
 	assert.Equal(t, 404, httpErr.Code)
+}
+
+func Test_SearchList(t *testing.T) {
+	client := DefaultTestKibanaClient()
+	searchClient := client.Search()
+
+	request, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
+	assert.Nil(t, err)
+
+	createdSearch, err := searchClient.Create(request)
+	assert.Nil(t, err, "Error creating search")
+	defer searchClient.Delete(createdSearch.Id)
+
+	listSearch, err := searchClient.List()
+	assert.Nil(t, err, "Error listing searches")
+	assert.NotNil(t, listSearch, "Response from list search is null")
+	assert.NotEmpty(t, listSearch, "Response from list search is empty")
 }
 
 func Test_SearchUpdate(t *testing.T) {

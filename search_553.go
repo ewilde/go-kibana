@@ -120,6 +120,41 @@ func (api *searchClient553) GetById(id string) (*Search, error) {
 	}, nil
 }
 
+func (api *searchClient553) List() ([]*Search, error) {
+	response, body, err := api.client.
+		Get(api.config.BuildFullPath("/%s", "search")).
+		Set("kbn-version", api.config.KibanaVersion).
+		End()
+
+	if err != nil {
+		return nil, err[0]
+	}
+
+	if response.StatusCode >= 300 {
+		if api.config.KibanaType == KibanaTypeLogzio && response.StatusCode >= 400 { // bug in their api reports missing search as bad request or server error
+			response.StatusCode = 404
+		}
+
+		return nil, NewError(response, body, "Could not fetch search")
+	}
+
+	listResp := make([]*searchReadResult553, 0)
+	error := json.Unmarshal([]byte(body), &listResp)
+	if error != nil {
+		return nil, fmt.Errorf("could not parse fields from list response, error: %v", error)
+	}
+
+	results := make([]*Search, len(listResp))
+	for i := range listResp {
+		results[i].Id = listResp[i].Id
+		results[i].Version = listResp[i].Version
+		results[i].Type = listResp[i].Type
+		results[i].Attributes = listResp[i].Source
+	}
+
+	return results, nil
+}
+
 func (api *searchClient553) Delete(id string) error {
 	response, body, err := api.client.
 		Delete(api.config.BuildFullPath("/%s/%s", "search", id)).
