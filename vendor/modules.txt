@@ -1,6 +1,6 @@
 # github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78
-github.com/Azure/go-ansiterm/winterm
 github.com/Azure/go-ansiterm
+github.com/Azure/go-ansiterm/winterm
 # github.com/Microsoft/go-winio v0.4.12
 github.com/Microsoft/go-winio
 # github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5
@@ -11,44 +11,12 @@ github.com/cenkalti/backoff
 github.com/containerd/continuity/pathdriver
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
-# github.com/docker/docker v0.7.3-0.20190309235953-33c3200e0d16
-github.com/docker/docker/api/types/registry
-github.com/docker/docker/api/types/swarm
-github.com/docker/docker/pkg/fileutils
-github.com/docker/docker/pkg/homedir
-github.com/docker/docker/pkg/stdcopy
-github.com/docker/docker/api/types/container
-github.com/docker/docker/api/types/mount
-github.com/docker/docker/api/types/network
-github.com/docker/docker/api/types/swarm/runtime
-github.com/docker/docker/pkg/idtools
-github.com/docker/docker/pkg/longpath
-github.com/docker/docker/pkg/pools
-github.com/docker/docker/pkg/system
-github.com/docker/docker/api/types/blkiodev
-github.com/docker/docker/api/types/strslice
-github.com/docker/docker/api/types/filters
-github.com/docker/docker/errdefs
-github.com/docker/docker/pkg/ioutils
-github.com/docker/docker/pkg/mount
-github.com/docker/docker/api/types/versions
 # github.com/docker/go-connections v0.4.0
 github.com/docker/go-connections/nat
 # github.com/docker/go-units v0.4.0
 github.com/docker/go-units
-# github.com/ewilde/go-kibana v0.0.0-20190620160343-8b4724ad91ef
-github.com/ewilde/go-kibana
-# github.com/fsouza/go-dockerclient v1.4.1
-github.com/fsouza/go-dockerclient
-github.com/fsouza/go-dockerclient/internal/archive
-github.com/fsouza/go-dockerclient/internal/jsonmessage
-github.com/fsouza/go-dockerclient/internal/term
-# github.com/gogo/protobuf v1.2.1
-github.com/gogo/protobuf/proto
 # github.com/google/go-querystring v1.0.0
 github.com/google/go-querystring/query
-# github.com/ijc/Gotty v0.0.0-20170406111628-a8b993ba6abd
-github.com/ijc/Gotty
 # github.com/konsorten/go-windows-terminal-sequences v1.0.1
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/mcuadros/go-version v0.0.0-20190308113854-92cdf37c5b75
@@ -58,8 +26,8 @@ github.com/moul/http2curl
 # github.com/opencontainers/go-digest v1.0.0-rc1
 github.com/opencontainers/go-digest
 # github.com/opencontainers/image-spec v1.0.1
-github.com/opencontainers/image-spec/specs-go/v1
 github.com/opencontainers/image-spec/specs-go
+github.com/opencontainers/image-spec/specs-go/v1
 # github.com/opencontainers/runc v0.1.1
 github.com/opencontainers/runc/libcontainer/user
 # github.com/ory/dockertest v3.3.5-0.20190702215553-e67b3164853f+incompatible
@@ -69,23 +37,23 @@ github.com/ory/dockertest/docker/opts
 github.com/ory/dockertest/docker/pkg/archive
 github.com/ory/dockertest/docker/pkg/fileutils
 github.com/ory/dockertest/docker/pkg/homedir
-github.com/ory/dockertest/docker/pkg/jsonmessage
-github.com/ory/dockertest/docker/pkg/stdcopy
-github.com/ory/dockertest/docker/types/registry
-github.com/ory/dockertest/docker/types
 github.com/ory/dockertest/docker/pkg/idtools
 github.com/ory/dockertest/docker/pkg/ioutils
+github.com/ory/dockertest/docker/pkg/jsonmessage
 github.com/ory/dockertest/docker/pkg/longpath
+github.com/ory/dockertest/docker/pkg/mount
 github.com/ory/dockertest/docker/pkg/pools
+github.com/ory/dockertest/docker/pkg/stdcopy
 github.com/ory/dockertest/docker/pkg/system
 github.com/ory/dockertest/docker/pkg/term
+github.com/ory/dockertest/docker/pkg/term/windows
+github.com/ory/dockertest/docker/types
+github.com/ory/dockertest/docker/types/blkiodev
 github.com/ory/dockertest/docker/types/container
 github.com/ory/dockertest/docker/types/filters
 github.com/ory/dockertest/docker/types/mount
 github.com/ory/dockertest/docker/types/network
-github.com/ory/dockertest/docker/pkg/mount
-github.com/ory/dockertest/docker/pkg/term/windows
-github.com/ory/dockertest/docker/types/blkiodev
+github.com/ory/dockertest/docker/types/registry
 github.com/ory/dockertest/docker/types/strslice
 github.com/ory/dockertest/docker/types/versions
 # github.com/parnurzeal/gorequest v0.2.15
@@ -104,11 +72,9 @@ github.com/stretchr/testify/assert
 github.com/xlzd/gotp
 # golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20180906233101-161cd47e91fd
-golang.org/x/net/publicsuffix
+# golang.org/x/net v0.0.0-20190311183353-d8887717615a
 golang.org/x/net/context
+golang.org/x/net/publicsuffix
 # golang.org/x/sys v0.0.0-20190310054646-10058d7d4faa
-golang.org/x/sys/windows
 golang.org/x/sys/unix
-# gopkg.in/ory-am/dockertest.v3 v3.3.4
-gopkg.in/ory-am/dockertest.v3
+golang.org/x/sys/windows
