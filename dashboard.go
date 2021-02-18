@@ -2,6 +2,7 @@ package kibana
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	uuid "github.com/satori/go.uuid"
@@ -296,39 +297,7 @@ func (api *dashboardClient553) GetById(id string) (*Dashboard, error) {
 }
 
 func (api *dashboardClient553) List() ([]*Dashboard, error) {
-	response, body, err := api.client.
-		Get(api.config.BuildFullPath("/%s", "dashboard")).
-		Set("kbn-version", api.config.KibanaVersion).
-		End()
-
-	if err != nil {
-		return nil, err[0]
-	}
-
-	if response.StatusCode >= 300 {
-		if api.config.KibanaType == KibanaTypeLogzio && response.StatusCode >= 400 { // bug in their api reports missing dashboard as bad request / server error
-			response.StatusCode = 404
-		}
-
-		return nil, NewError(response, body, "Could not fetch dashboard")
-	}
-
-	listResp := make([]*dashboardReadResult553, 0)
-	var listErr error
-	listErr = json.Unmarshal([]byte(body), &listResp)
-	if listErr != nil {
-		return nil, fmt.Errorf("could not parse fields from dashboard list response, error: %v", listErr)
-	}
-
-	results := make([]*Dashboard, len(listResp))
-	for i := range listResp {
-		results[i].Id = listResp[i].Id
-		results[i].Version = listResp[i].Version
-		results[i].Type = listResp[i].Type
-		results[i].Attributes = listResp[i].Source
-	}
-
-	return results, nil
+	return nil, errors.New("not implemnted")
 }
 
 func (api *dashboardClient553) Update(id string, request *UpdateDashboardRequest) (*Dashboard, error) {

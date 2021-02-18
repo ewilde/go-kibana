@@ -2,6 +2,7 @@ package kibana
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	goversion "github.com/mcuadros/go-version"
@@ -318,39 +319,7 @@ func (api *visualizationClient553) GetById(id string) (*Visualization, error) {
 }
 
 func (api *visualizationClient553) List() ([]*Visualization, error) {
-	response, body, err := api.client.
-		Get(api.config.BuildFullPath("/%s", "visualization")).
-		Set("kbn-version", api.config.KibanaVersion).
-		End()
-
-	if err != nil {
-		return nil, err[0]
-	}
-
-	if response.StatusCode >= 300 {
-		if api.config.KibanaType == KibanaTypeLogzio && response.StatusCode >= 400 { // bug in their api reports missing dashboard as bad request / server error
-			response.StatusCode = 404
-		}
-
-		return nil, NewError(response, body, "Could not fetch visualization")
-	}
-
-	listResp := make([]*visualizationReadResult553, 0)
-	var listErr error
-	listErr = json.Unmarshal([]byte(body), &listResp)
-	if listErr != nil {
-		return nil, fmt.Errorf("could not parse fields from visualization list response, error: %v", listErr)
-	}
-
-	results := make([]*Visualization, len(listResp))
-	for i := range listResp {
-		results[i].Id = listResp[i].Id
-		results[i].Version = listResp[i].Version
-		results[i].Type = listResp[i].Type
-		results[i].Attributes = listResp[i].Source
-	}
-
-	return results, nil
+	return nil, errors.New("not implemented")
 }
 
 func (api *visualizationClient553) Update(id string, request *UpdateVisualizationRequest) (*Visualization, error) {
