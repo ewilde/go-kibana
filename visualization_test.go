@@ -3,6 +3,7 @@ package kibana
 import (
 	"testing"
 
+	goversion "github.com/mcuadros/go-version"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -77,6 +78,10 @@ func Test_VisualizationRead_Unknown_Visualization_Returns_404(t *testing.T) {
 
 func Test_VisualizationList(t *testing.T) {
 	client := DefaultTestKibanaClient()
+	if goversion.Compare(client.Config.KibanaVersion, "6.3.0", "<") {
+		t.SkipNow()
+	}
+
 	visualizationApi := client.Visualization()
 
 	request, err := NewVisualizationRequestBuilder().

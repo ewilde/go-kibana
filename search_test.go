@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	goversion "github.com/mcuadros/go-version"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -277,6 +278,10 @@ func Test_SearchRead_Unknown_Search_Returns_404(t *testing.T) {
 
 func Test_SearchList(t *testing.T) {
 	client := DefaultTestKibanaClient()
+	if goversion.Compare(client.Config.KibanaVersion, "6.3.0", "<") {
+		t.SkipNow()
+	}
+
 	searchClient := client.Search()
 
 	request, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
