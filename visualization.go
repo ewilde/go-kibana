@@ -9,6 +9,17 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+const (
+	VisualizationReferencesTypeSearch visualizationReferencesType = "search"
+	VisualizationReferencesTypeIndex  visualizationReferencesType = "index"
+)
+
+type visualizationReferencesType string
+
+func (r visualizationReferencesType) String() string {
+	return string(r)
+}
+
 type VisualizationClient interface {
 	Create(request *CreateVisualizationRequest) (*Visualization, error)
 	GetById(id string) (*Visualization, error)
@@ -36,9 +47,9 @@ type Visualization struct {
 }
 
 type VisualizationReferences struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Id   string `json:"id"`
+	Name string                      `json:"name"`
+	Type visualizationReferencesType `json:"type"`
+	Id   string                      `json:"id"`
 }
 
 type VisualizationAttributes struct {
@@ -58,6 +69,7 @@ type VisualizationRequestBuilder struct {
 	savedSearchId         string
 	savedSearchRefName    string
 	kibanaSavedObjectMeta *SearchKibanaSavedObjectMeta
+	references            []*VisualizationReferences
 }
 
 type visualizationClient600 struct {
@@ -111,6 +123,11 @@ func (builder *VisualizationRequestBuilder) WithKibanaSavedObjectMeta(meta *Sear
 	return builder
 }
 
+func (builder *VisualizationRequestBuilder) WithReferences(refs []*VisualizationReferences) *VisualizationRequestBuilder {
+	builder.references = refs
+	return builder
+}
+
 func (builder *VisualizationRequestBuilder) Build(version string) (*CreateVisualizationRequest, error) {
 	if goversion.Compare(version, "7.0.0", "<") {
 		return &CreateVisualizationRequest{
@@ -124,7 +141,7 @@ func (builder *VisualizationRequestBuilder) Build(version string) (*CreateVisual
 			},
 		}, nil
 	} else {
-		return &CreateVisualizationRequest{
+		req := &CreateVisualizationRequest{
 			Attributes: &VisualizationAttributes{
 				Title:                 builder.title,
 				Description:           builder.description,
@@ -140,8 +157,14 @@ func (builder *VisualizationRequestBuilder) Build(version string) (*CreateVisual
 					Id:   builder.savedSearchId,
 				},
 			},
-		}, nil
+		}
 
+		if len(builder.references) > 0 {
+			req.References = builder.references
+			req.Attributes.SavedSearchRefName = ""
+		}
+
+		return req, nil
 	}
 }
 
