@@ -51,7 +51,7 @@ func Test_VisualizationCreateWithReferences(t *testing.T) {
 		{
 			Id:   "456",
 			Name: "TestIndex",
-			Type: VisualizationReferencesTypeIndex,
+			Type: VisualizationReferencesTypeIndexPattern,
 		},
 		{
 			Id:   "789",
@@ -75,7 +75,7 @@ func Test_VisualizationCreateWithReferences(t *testing.T) {
 	assert.NotEmpty(t, response.References)
 	assert.Equal(t, "456", response.References[0].Id)
 	assert.Equal(t, "TestIndex", response.References[0].Name)
-	assert.Equal(t, VisualizationReferencesTypeIndex, response.References[0].Type)
+	assert.Equal(t, VisualizationReferencesTypeIndexPattern, response.References[0].Type)
 	assert.Equal(t, "789", response.References[1].Id)
 	assert.Equal(t, "TestSearch", response.References[1].Name)
 	assert.Equal(t, VisualizationReferencesTypeSearch, response.References[1].Type)
