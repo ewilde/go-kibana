@@ -9,6 +9,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_SortUnmarshalJSON(t *testing.T) {
+	s := &Sort{}
+	err := json.Unmarshal([]byte(`["@timestamp", "desc"]`), s)
+	assert.NoError(t, err)
+	assert.Equal(t, &Sort{"@timestamp", "desc"}, s)
+
+	s = &Sort{}
+	err = json.Unmarshal([]byte(`[["@name", "desc"]]`), s)
+	assert.NoError(t, err)
+	assert.Equal(t, &Sort{"@name", "desc"}, s)
+}
+
 func Test_SearchCreate(t *testing.T) {
 	client := DefaultTestKibanaClient()
 	searchApi := client.Search()
