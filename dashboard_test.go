@@ -9,6 +9,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func newTestDashboardRequestBuilder(visID, searchID string) *DashboardRequestBuilder {
+	builder := NewDashboardRequestBuilder().
+		WithTitle("China errors").
+		WithDescription("This dashboard shows errors from china").
+		WithPanelsJson(fmt.Sprintf("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"%s\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"%s\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]", visID, searchID)).
+		WithOptionsJson("{\"darkTheme\":false}")
+
+	return builder
+}
+
 func Test_DashboardCreateFromSavedSearch(t *testing.T) {
 	client := DefaultTestKibanaClient()
 
@@ -37,12 +47,7 @@ func Test_DashboardCreateFromSavedSearch(t *testing.T) {
 
 	dashboardApi := client.Dashboard()
 
-	dashboardRequest, err := NewDashboardRequestBuilder().
-		WithTitle("China errors").
-		WithDescription("This dashboard shows errors from china").
-		WithPanelsJson(fmt.Sprintf("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"%s\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"%s\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]", visualizationResponse.Id, searchResponse.Id)).
-		WithOptionsJson("{\"darkTheme\":false}").
-		Build()
+	dashboardRequest, err := newTestDashboardRequestBuilder(visualizationResponse.Id, searchResponse.Id).Build()
 
 	assert.Nil(t, err)
 
@@ -60,16 +65,76 @@ func Test_DashboardCreateFromSavedSearch(t *testing.T) {
 	assert.Equal(t, dashboardRequest.Attributes.Version, response.Attributes.Version)
 }
 
+func Test_DashboardCreateFromSavedSearchWithReferences(t *testing.T) {
+	client := DefaultTestKibanaClient()
+	if goversion.Compare(client.Config.KibanaVersion, "7.0.0", "<") {
+		t.SkipNow()
+	}
+
+	searchClient := client.Search()
+	searchRequest, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
+	assert.Nil(t, err)
+	searchResponse, err := searchClient.Create(searchRequest)
+	assert.Nil(t, err)
+	defer searchClient.Delete(searchResponse.Id)
+
+	visualizationApi := client.Visualization()
+
+	builder := newTestVisualizationRequestBuilder()
+	request, err := builder.
+		WithSavedSearchId(searchResponse.Id).
+		Build(client.Config.KibanaVersion)
+	assert.Nil(t, err)
+
+	visualizationResponse, err := visualizationApi.Create(request)
+	defer visualizationApi.Delete(visualizationResponse.Id)
+
+	dashboardApi := client.Dashboard()
+
+	dashboardRequest, err := newTestDashboardRequestBuilder(visualizationResponse.Id, searchResponse.Id).
+		WithPanelsJson("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"panelRefName\":\"panel_0\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"panelRefName\":\"panel_1\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]").
+		WithReferences([]*DashboardReferences{
+			{
+				Id:   visualizationResponse.Id,
+				Name: "panel_0",
+				Type: DashboardReferencesTypeVisualization,
+			},
+			{
+				Id:   searchResponse.Id,
+				Name: "panel_1",
+				Type: DashboardReferencesTypeSearch,
+			},
+		}).
+		Build()
+
+	assert.Nil(t, err)
+
+	response, err := dashboardApi.Create(dashboardRequest)
+	assert.Nil(t, err)
+
+	defer dashboardApi.Delete(response.Id)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, dashboardRequest.Attributes.Title, response.Attributes.Title)
+	assert.Equal(t, dashboardRequest.Attributes.PanelsJson, response.Attributes.PanelsJson)
+	assert.Equal(t, dashboardRequest.Attributes.OptionsJson, response.Attributes.OptionsJson)
+	assert.Equal(t, dashboardRequest.Attributes.UiStateJSON, response.Attributes.UiStateJSON)
+	assert.Equal(t, dashboardRequest.Attributes.Version, response.Attributes.Version)
+	assert.NotEmpty(t, response.References)
+	assert.Equal(t, visualizationResponse.Id, response.References[0].Id)
+	assert.Equal(t, "panel_0", response.References[0].Name)
+	assert.Equal(t, DashboardReferencesTypeVisualization, response.References[0].Type)
+	assert.Equal(t, searchResponse.Id, response.References[1].Id)
+	assert.Equal(t, "panel_1", response.References[1].Name)
+	assert.Equal(t, DashboardReferencesTypeSearch, response.References[1].Type)
+}
+
 func Test_DashboardRead(t *testing.T) {
 	client := DefaultTestKibanaClient()
 	dashboardApi := client.Dashboard()
 
-	request, err := NewDashboardRequestBuilder().
-		WithTitle("China errors").
-		WithDescription("This dashboard shows errors from china").
-		WithPanelsJson("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"bc8a1970-175b-11e8-accb-65182aaf9591\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"aca8b340-175b-11e8-accb-65182aaf9591\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]").
-		WithOptionsJson("{\"darkTheme\":false}").
-		Build()
+	request, err := newTestDashboardRequestBuilder("bc8a1970-175b-11e8-accb-65182aaf9591", "aca8b340-175b-11e8-accb-65182aaf9591").Build()
 
 	assert.Nil(t, err)
 
@@ -112,12 +177,7 @@ func Test_DashboardList(t *testing.T) {
 
 	dashboardApi := client.Dashboard()
 
-	request, err := NewDashboardRequestBuilder().
-		WithTitle("China errors").
-		WithDescription("This dashboard shows errors from china").
-		WithPanelsJson("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"bc8a1970-175b-11e8-accb-65182aaf9591\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"aca8b340-175b-11e8-accb-65182aaf9591\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]").
-		WithOptionsJson("{\"darkTheme\":false}").
-		Build()
+	request, err := newTestDashboardRequestBuilder("bc8a1970-175b-11e8-accb-65182aaf9591", "aca8b340-175b-11e8-accb-65182aaf9591").Build()
 
 	assert.Nil(t, err)
 
@@ -135,12 +195,7 @@ func Test_DashboardUpdate(t *testing.T) {
 	client := DefaultTestKibanaClient()
 	dashboardApi := client.Dashboard()
 
-	request, err := NewDashboardRequestBuilder().
-		WithTitle("China errors").
-		WithDescription("This dashboard shows errors from china").
-		WithPanelsJson("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"type\":\"visualization\",\"id\":\"bc8a1970-175b-11e8-accb-65182aaf9591\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"type\":\"search\",\"id\":\"aca8b340-175b-11e8-accb-65182aaf9591\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]").
-		WithOptionsJson("{\"darkTheme\":false}").
-		Build()
+	request, err := newTestDashboardRequestBuilder("bc8a1970-175b-11e8-accb-65182aaf9591", "aca8b340-175b-11e8-accb-65182aaf9591").Build()
 
 	assert.Nil(t, err)
 
