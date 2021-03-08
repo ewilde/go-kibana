@@ -67,6 +67,9 @@ func Test_DashboardCreateFromSavedSearch(t *testing.T) {
 
 func Test_DashboardCreateFromSavedSearchWithReferences(t *testing.T) {
 	client := DefaultTestKibanaClient()
+	if goversion.Compare(client.Config.KibanaVersion, "7.0.0", "<") {
+		t.SkipNow()
+	}
 
 	searchClient := client.Search()
 	searchRequest, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
@@ -89,15 +92,16 @@ func Test_DashboardCreateFromSavedSearchWithReferences(t *testing.T) {
 	dashboardApi := client.Dashboard()
 
 	dashboardRequest, err := newTestDashboardRequestBuilder(visualizationResponse.Id, searchResponse.Id).
+		WithPanelsJson("[{\"size_x\":6,\"size_y\":3,\"panelIndex\":1,\"panelRefName\":\"panel_0\",\"col\":1,\"row\":1},{\"size_x\":6,\"size_y\":3,\"panelIndex\":2,\"panelRefName\":\"panel_1\",\"col\":7,\"row\":1,\"columns\":[\"_source\"],\"sort\":[\"@timestamp\",\"desc\"]}]").
 		WithReferences([]*DashboardReferences{
 			{
 				Id:   visualizationResponse.Id,
-				Name: "TestVisualization",
+				Name: "panel_0",
 				Type: DashboardReferencesTypeVisualization,
 			},
 			{
 				Id:   searchResponse.Id,
-				Name: "TestSearch",
+				Name: "panel_1",
 				Type: DashboardReferencesTypeSearch,
 			},
 		}).
@@ -119,10 +123,10 @@ func Test_DashboardCreateFromSavedSearchWithReferences(t *testing.T) {
 	assert.Equal(t, dashboardRequest.Attributes.Version, response.Attributes.Version)
 	assert.NotEmpty(t, response.References)
 	assert.Equal(t, visualizationResponse.Id, response.References[0].Id)
-	assert.Equal(t, "TestVisualization", response.References[0].Name)
+	assert.Equal(t, "panel_0", response.References[0].Name)
 	assert.Equal(t, DashboardReferencesTypeVisualization, response.References[0].Type)
 	assert.Equal(t, searchResponse.Id, response.References[1].Id)
-	assert.Equal(t, "TestSearch", response.References[1].Name)
+	assert.Equal(t, "panel_1", response.References[1].Name)
 	assert.Equal(t, DashboardReferencesTypeSearch, response.References[1].Type)
 }
 
