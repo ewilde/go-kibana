@@ -162,7 +162,7 @@ func Test_SearchCreateWithReferences(t *testing.T) {
 
 	responseSearch := &SearchSource{}
 	json.Unmarshal([]byte(response.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
-	assert.Equal(t, "", responseSearch.IndexId)
+	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
 	assert.Equal(t, "kibanaSavedObjectMeta.searchSourceJSON.index", responseSearch.IndexRefName)
 
 	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
