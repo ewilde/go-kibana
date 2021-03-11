@@ -162,7 +162,7 @@ func Test_SearchCreateWithReferences(t *testing.T) {
 
 	responseSearch := &SearchSource{}
 	json.Unmarshal([]byte(response.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
-	assert.Equal(t, "", responseSearch.IndexId)
+	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
 	assert.Equal(t, "kibanaSavedObjectMeta.searchSourceJSON.index", responseSearch.IndexRefName)
 
 	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
@@ -175,7 +175,7 @@ func Test_SearchCreateWithReferences(t *testing.T) {
 	assert.Equal(t, requestSearch.Filter[0].Meta.Disabled, responseSearch.Filter[0].Meta.Disabled)
 	assert.Equal(t, requestSearch.Filter[0].Meta.Negate, responseSearch.Filter[0].Meta.Negate)
 	assert.Equal(t, "", responseSearch.Filter[0].Meta.Index)
-	assert.Equal(t, "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index", responseSearch.Filter[0].Meta.Index)
+	assert.Equal(t, "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index", responseSearch.Filter[0].Meta.IndexRefName)
 	assert.Equal(t, requestSearch.Filter[0].Meta.Params.Query, responseSearch.Filter[0].Meta.Params.Query)
 	assert.Equal(t, requestSearch.Filter[0].Meta.Params.Type, responseSearch.Filter[0].Meta.Params.Type)
 	assert.Equal(t, "logzioCustomerIndex*", response.References[0].Id)
