@@ -100,6 +100,7 @@ func Test_SearchCreateWithReferences(t *testing.T) {
 	searchApi := client.Search()
 
 	requestSearch, err := searchApi.NewSearchSource().
+		WithIndexId(client.Config.DefaultIndexId).
 		WithIndexRefName("kibanaSavedObjectMeta.searchSourceJSON.index").
 		WithFilter(&SearchFilter{
 			Query: &SearchFilterQuery{
