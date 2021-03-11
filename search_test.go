@@ -100,7 +100,6 @@ func Test_SearchCreateWithReferences(t *testing.T) {
 	searchApi := client.Search()
 
 	requestSearch, err := searchApi.NewSearchSource().
-		WithIndexId(client.Config.DefaultIndexId).
 		WithIndexRefName("kibanaSavedObjectMeta.searchSourceJSON.index").
 		WithFilter(&SearchFilter{
 			Query: &SearchFilterQuery{
@@ -162,7 +161,6 @@ func Test_SearchCreateWithReferences(t *testing.T) {
 
 	responseSearch := &SearchSource{}
 	json.Unmarshal([]byte(response.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
-	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
 	assert.Equal(t, "kibanaSavedObjectMeta.searchSourceJSON.index", responseSearch.IndexRefName)
 
 	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
