@@ -93,6 +93,10 @@ func Test_SearchCreate(t *testing.T) {
 
 func Test_SearchCreateWithReferences(t *testing.T) {
 	client := DefaultTestKibanaClient()
+	if goversion.Compare(client.Config.KibanaVersion, "7.0.0", "<") {
+		t.SkipNow()
+	}
+
 	searchApi := client.Search()
 
 	requestSearch, err := searchApi.NewSearchSource().
