@@ -91,6 +91,94 @@ func Test_SearchCreate(t *testing.T) {
 	assert.Equal(t, requestSearch.Filter[0].Meta.Params.Type, responseSearch.Filter[0].Meta.Params.Type)
 }
 
+func Test_SearchCreateWithReferences(t *testing.T) {
+	client := DefaultTestKibanaClient()
+	searchApi := client.Search()
+
+	requestSearch, err := searchApi.NewSearchSource().
+		WithIndexId(client.Config.DefaultIndexId).
+		WithFilter(&SearchFilter{
+			Query: &SearchFilterQuery{
+				Match: map[string]*SearchFilterQueryAttributes{
+					"geo.src": {
+						Query: "CN",
+						Type:  "phrase",
+					},
+				},
+			},
+			Meta: &SearchFilterMetaData{
+				Index:    client.Config.DefaultIndexId,
+				Negate:   false,
+				Disabled: false,
+				Alias:    "China",
+				Type:     "phrase",
+				Key:      "geo.src",
+				Value:    "CN",
+				Params: &SearchFilterQueryAttributes{
+					Query: "CN",
+					Type:  "phrase",
+				},
+			},
+		}).
+		Build()
+
+	assert.Nil(t, err)
+
+	request, err := NewSearchRequestBuilder().
+		WithTitle("Geography filter on china").
+		WithDisplayColumns([]string{"_source"}).
+		WithSortColumns([]string{"@timestamp"}, Descending).
+		WithSearchSource(requestSearch).
+		WithReferences([]*SearchReferences{
+			{
+				Id:   "logzioCustomerIndex*",
+				Name: "kibanaSavedObjectMeta.searchSourceJSON.index",
+				Type: SearchReferencesTypeIndexPattern,
+			},
+			{
+				Id:   "logzioCustomerIndex*",
+				Name: "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+				Type: SearchReferencesTypeIndexPattern,
+			},
+		}).
+		Build()
+
+	assert.Nil(t, err)
+
+	response, err := searchApi.Create(request)
+	defer searchApi.Delete(response.Id)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, response)
+	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
+	assert.Equal(t, request.Attributes.Columns, response.Attributes.Columns)
+	assert.Equal(t, request.Attributes.Sort, response.Attributes.Sort)
+	assert.NotEmpty(t, request.Attributes.KibanaSavedObjectMeta.SearchSourceJSON)
+
+	responseSearch := &SearchSource{}
+	json.Unmarshal([]byte(response.Attributes.KibanaSavedObjectMeta.SearchSourceJSON), responseSearch)
+	assert.Equal(t, requestSearch.IndexId, responseSearch.IndexId)
+
+	assert.Len(t, responseSearch.Filter, len(requestSearch.Filter))
+	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Query, responseSearch.Filter[0].Query.Match["geo.src"].Query)
+	assert.Equal(t, requestSearch.Filter[0].Query.Match["geo.src"].Type, responseSearch.Filter[0].Query.Match["geo.src"].Type)
+
+	assert.Equal(t, requestSearch.Filter[0].Meta.Type, responseSearch.Filter[0].Meta.Type)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Key, responseSearch.Filter[0].Meta.Key)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Alias, responseSearch.Filter[0].Meta.Alias)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Disabled, responseSearch.Filter[0].Meta.Disabled)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Negate, responseSearch.Filter[0].Meta.Negate)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Index, responseSearch.Filter[0].Meta.Index)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Params.Query, responseSearch.Filter[0].Meta.Params.Query)
+	assert.Equal(t, requestSearch.Filter[0].Meta.Params.Type, responseSearch.Filter[0].Meta.Params.Type)
+	assert.Equal(t, "logzioCustomerIndex*", response.References[0].Id)
+	assert.Equal(t, "kibanaSavedObjectMeta.searchSourceJSON.index", response.References[0].Name)
+	assert.Equal(t, SearchReferencesTypeIndexPattern, response.References[0].Type)
+	assert.Equal(t, "logzioCustomerIndex*", response.References[1].Id)
+	assert.Equal(t, "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index", response.References[1].Name)
+	assert.Equal(t, SearchReferencesTypeIndexPattern, response.References[1].Type)
+}
+
 func Test_SearchCreate_with_exists_field(t *testing.T) {
 	client := DefaultTestKibanaClient()
 	searchApi := client.Search()
