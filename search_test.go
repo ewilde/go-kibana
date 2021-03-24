@@ -7,6 +7,7 @@ import (
 	goversion "github.com/mcuadros/go-version"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_SortUnmarshalJSON(t *testing.T) {
@@ -61,12 +62,12 @@ func Test_SearchCreate(t *testing.T) {
 		WithSearchSource(requestSearch).
 		Build()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	response, err := searchApi.Create(request)
+	require.NoError(t, err)
 	defer searchApi.Delete(response.Id)
 
-	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
 	assert.Equal(t, request.Attributes.Columns, response.Attributes.Columns)
@@ -126,7 +127,7 @@ func Test_SearchCreateWithReferences(t *testing.T) {
 		}).
 		Build()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography filter on china").
@@ -147,12 +148,12 @@ func Test_SearchCreateWithReferences(t *testing.T) {
 		}).
 		Build()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	response, err := searchApi.Create(request)
+	require.NoError(t, err)
 	defer searchApi.Delete(response.Id)
 
-	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
 	assert.Equal(t, request.Attributes.Columns, response.Attributes.Columns)
@@ -205,7 +206,7 @@ func Test_SearchCreate_with_exists_field(t *testing.T) {
 		}).
 		Build()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography filter on china").
@@ -214,12 +215,12 @@ func Test_SearchCreate_with_exists_field(t *testing.T) {
 		WithSearchSource(requestSearch).
 		Build()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	response, err := searchApi.Create(request)
+	require.NoError(t, err)
 	defer searchApi.Delete(response.Id)
 
-	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
 	assert.Equal(t, request.Attributes.Columns, response.Attributes.Columns)
@@ -269,7 +270,7 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 		}).
 		Build()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography filter on china with errors").
@@ -278,12 +279,12 @@ func Test_SearchCreate_with_two_filters(t *testing.T) {
 		WithSearchSource(requestSearch).
 		Build()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	response, err := searchApi.Create(request)
+	require.NoError(t, err)
 	defer searchApi.Delete(response.Id)
 
-	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
 	assert.Equal(t, request.Attributes.Columns, response.Attributes.Columns)
@@ -309,7 +310,7 @@ func Test_SearchCreate_with_query(t *testing.T) {
 		WithQuery("geo.src:china").
 		Build()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	request, err := NewSearchRequestBuilder().
 		WithTitle("Geography search on china with errors").
@@ -318,12 +319,12 @@ func Test_SearchCreate_with_query(t *testing.T) {
 		WithSearchSource(requestSearch).
 		Build()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	response, err := searchApi.Create(request)
+	require.NoError(t, err)
 	defer searchApi.Delete(response.Id)
 
-	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
 	assert.Equal(t, request.Attributes.Columns, response.Attributes.Columns)
@@ -342,15 +343,15 @@ func Test_SearchRead(t *testing.T) {
 
 	request, requestSearch, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	createdSearch, err := searchClient.Create(request)
+	require.NoError(t, err, "Error creating search")
 	defer searchClient.Delete(createdSearch.Id)
-	assert.Nil(t, err, "Error creating search")
 
 	readSearch, err := searchClient.GetById(createdSearch.Id)
 
-	assert.Nil(t, err, "Error getting search by id")
+	assert.NoError(t, err, "Error getting search by id")
 	assert.NotNil(t, readSearch, "Search retrieved from get by id was null.")
 
 	assert.Equal(t, request.Attributes.Title, readSearch.Attributes.Title)
@@ -372,12 +373,9 @@ func Test_SearchRead_Unknown_Search_Returns_404(t *testing.T) {
 	searchClient := client.Search()
 	_, err := searchClient.GetById(uuid.NewV4().String())
 
-	assert.NotNil(t, err, "Expected to get a 404 error")
+	require.NoError(t, err, "Expected to get a 404 error")
 	httpErr, ok := err.(*HttpError)
-	if !ok {
-		t.Error("Expected http error")
-	}
-
+	require.True(t, ok, "Expected http error")
 	assert.Equal(t, 404, httpErr.Code)
 }
 
@@ -390,14 +388,14 @@ func Test_SearchList(t *testing.T) {
 	searchClient := client.Search()
 
 	request, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	createdSearch, err := searchClient.Create(request)
-	assert.Nil(t, err, "Error creating search")
+	require.NoError(t, err, "Error creating search")
 	defer searchClient.Delete(createdSearch.Id)
 
 	listSearch, err := searchClient.List()
-	assert.Nil(t, err, "Error listing searches")
+	require.NoError(t, err, "Error listing searches")
 	assert.NotNil(t, listSearch, "Response from list search is null")
 	assert.NotEmpty(t, listSearch, "Response from list search is empty")
 }
@@ -407,9 +405,9 @@ func Test_SearchUpdate(t *testing.T) {
 	searchClient := client.Search()
 
 	request, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	search, err := searchClient.Create(request)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	defer func() {
 		err = searchClient.Delete(search.Id)
 		assert.Nil(t, err, "Delete returned error:%+v", err)
@@ -426,15 +424,15 @@ func Test_SearchDelete(t *testing.T) {
 	searchClient := client.Search()
 
 	request, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	response, err := searchClient.Create(request)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	err = searchClient.Delete(response.Id)
-	assert.Nil(t, err, "Delete returned error:%+v", err)
+	require.NoError(t, err, "Delete returned error:%+v", err)
 
 	response, err = searchClient.GetById(response.Id)
-	assert.Nil(t, response, "Response should be nil after being deleted")
+	require.Nil(t, response, "Response should be nil after being deleted")
 }
 
 func createSearchRequest(factory SearchSourceBuilderFactory, indexId string, t *testing.T) (*CreateSearchRequest, *SearchSource, error) {

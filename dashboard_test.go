@@ -7,6 +7,7 @@ import (
 	goversion "github.com/mcuadros/go-version"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func newTestDashboardRequestBuilder(visID, searchID string) *DashboardRequestBuilder {
@@ -26,7 +27,7 @@ func Test_DashboardCreateFromSavedSearch(t *testing.T) {
 	searchRequest, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
 	assert.Nil(t, err)
 	searchResponse, err := searchClient.Create(searchRequest)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	defer searchClient.Delete(searchResponse.Id)
 
 	visualizationApi := client.Visualization()
@@ -75,7 +76,7 @@ func Test_DashboardCreateFromSavedSearchWithReferences(t *testing.T) {
 	searchRequest, _, err := createSearchRequest(searchClient, client.Config.DefaultIndexId, t)
 	assert.Nil(t, err)
 	searchResponse, err := searchClient.Create(searchRequest)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	defer searchClient.Delete(searchResponse.Id)
 
 	visualizationApi := client.Visualization()
@@ -139,8 +140,8 @@ func Test_DashboardRead(t *testing.T) {
 	assert.Nil(t, err)
 
 	createdDashboard, err := dashboardApi.Create(request)
+	require.NoError(t, err, "Error creating dashboard")
 	defer dashboardApi.Delete(createdDashboard.Id)
-	assert.Nil(t, err, "Error creating dashboard")
 
 	readDashboard, err := dashboardApi.GetById(createdDashboard.Id)
 
@@ -162,10 +163,7 @@ func Test_DashboardRead_Unknown_Dashboard_Returns_404(t *testing.T) {
 
 	assert.NotNil(t, err, "Expected to get a 404 error")
 	httpErr, ok := err.(*HttpError)
-	if !ok {
-		t.Error("Expected http error")
-	}
-
+	require.True(t, ok, "Expected http error")
 	assert.Equal(t, 404, httpErr.Code)
 }
 
@@ -182,7 +180,7 @@ func Test_DashboardList(t *testing.T) {
 	assert.Nil(t, err)
 
 	createdDashboard, err := dashboardApi.Create(request)
-	assert.Nil(t, err, "Error creating dashboard")
+	require.NoError(t, err, "Error creating dashboard")
 	defer dashboardApi.Delete(createdDashboard.Id)
 
 	listDashboard, err := dashboardApi.List()
@@ -200,7 +198,7 @@ func Test_DashboardUpdate(t *testing.T) {
 	assert.Nil(t, err)
 
 	createdDashboard, err := dashboardApi.Create(request)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	defer dashboardApi.Delete(createdDashboard.Id)
 	assert.Nil(t, err, "Error creating dashboard")
 

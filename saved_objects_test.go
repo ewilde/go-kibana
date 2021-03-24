@@ -1,8 +1,10 @@
 package kibana
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_SavedObjectsGetByType(t *testing.T) {
@@ -15,9 +17,9 @@ func Test_SavedObjectsGetByType(t *testing.T) {
 			WithPerPage(15).
 			Build())
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
-	assert.NotNil(t, result)
+	require.NotNil(t, result)
 	assert.Equal(t, 1, result.Page)
 	assert.Equal(t, 15, result.PerPage)
 	assert.Equal(t, 1, result.Total)
@@ -39,9 +41,9 @@ func Test_SavedObjectsGetByType_with_multiple_fields(t *testing.T) {
 			WithPerPage(15).
 			Build())
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
-	assert.NotNil(t, result)
+	require.NotNil(t, result)
 	assert.Equal(t, 1, result.Page)
 	assert.Equal(t, 15, result.PerPage)
 	assert.Equal(t, 1, result.Total)
