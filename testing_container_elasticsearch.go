@@ -7,8 +7,8 @@ import (
 	"log"
 	"os"
 
-	dockertest "github.com/ory/dockertest"
-	dck "github.com/ory/dockertest/docker"
+	dockertest "github.com/ory/dockertest/v3"
+	dck "github.com/ory/dockertest/v3/docker"
 	"github.com/parnurzeal/gorequest"
 )
 

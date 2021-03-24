@@ -1,13 +1,14 @@
 # github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78
 github.com/Azure/go-ansiterm
 github.com/Azure/go-ansiterm/winterm
-# github.com/Microsoft/go-winio v0.4.12
+# github.com/Microsoft/go-winio v0.4.14
 github.com/Microsoft/go-winio
+github.com/Microsoft/go-winio/pkg/guid
 # github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5
 github.com/Nvveen/Gotty
-# github.com/cenkalti/backoff v2.1.1+incompatible
-github.com/cenkalti/backoff
-# github.com/containerd/continuity v0.0.0-20181203112020-004b46473808
+# github.com/cenkalti/backoff/v3 v3.0.0
+github.com/cenkalti/backoff/v3
+# github.com/containerd/continuity v0.0.0-20190827140505-75bee3e2ccb6
 github.com/containerd/continuity/pathdriver
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
@@ -17,10 +18,13 @@ github.com/docker/go-connections/nat
 github.com/docker/go-units
 # github.com/google/go-querystring v1.0.0
 github.com/google/go-querystring/query
-# github.com/konsorten/go-windows-terminal-sequences v1.0.1
+# github.com/konsorten/go-windows-terminal-sequences v1.0.2
 github.com/konsorten/go-windows-terminal-sequences
 # github.com/mcuadros/go-version v0.0.0-20190308113854-92cdf37c5b75
 github.com/mcuadros/go-version
+# github.com/moby/term v0.0.0-20200915141129-7f0af18e79f2
+github.com/moby/term
+github.com/moby/term/windows
 # github.com/moul/http2curl v1.0.0
 github.com/moul/http2curl
 # github.com/opencontainers/go-digest v1.0.0-rc1
@@ -28,55 +32,52 @@ github.com/opencontainers/go-digest
 # github.com/opencontainers/image-spec v1.0.1
 github.com/opencontainers/image-spec/specs-go
 github.com/opencontainers/image-spec/specs-go/v1
-# github.com/opencontainers/runc v0.1.1
+# github.com/opencontainers/runc v1.0.0-rc9
 github.com/opencontainers/runc/libcontainer/user
-# github.com/ory/dockertest v3.3.5-0.20190702215553-e67b3164853f+incompatible
-github.com/ory/dockertest
-github.com/ory/dockertest/docker
-github.com/ory/dockertest/docker/opts
-github.com/ory/dockertest/docker/pkg/archive
-github.com/ory/dockertest/docker/pkg/fileutils
-github.com/ory/dockertest/docker/pkg/homedir
-github.com/ory/dockertest/docker/pkg/idtools
-github.com/ory/dockertest/docker/pkg/ioutils
-github.com/ory/dockertest/docker/pkg/jsonmessage
-github.com/ory/dockertest/docker/pkg/longpath
-github.com/ory/dockertest/docker/pkg/mount
-github.com/ory/dockertest/docker/pkg/pools
-github.com/ory/dockertest/docker/pkg/stdcopy
-github.com/ory/dockertest/docker/pkg/system
-github.com/ory/dockertest/docker/pkg/term
-github.com/ory/dockertest/docker/pkg/term/windows
-github.com/ory/dockertest/docker/types
-github.com/ory/dockertest/docker/types/blkiodev
-github.com/ory/dockertest/docker/types/container
-github.com/ory/dockertest/docker/types/filters
-github.com/ory/dockertest/docker/types/mount
-github.com/ory/dockertest/docker/types/network
-github.com/ory/dockertest/docker/types/registry
-github.com/ory/dockertest/docker/types/strslice
-github.com/ory/dockertest/docker/types/versions
+# github.com/ory/dockertest/v3 v3.6.3
+github.com/ory/dockertest/v3
+github.com/ory/dockertest/v3/docker
+github.com/ory/dockertest/v3/docker/opts
+github.com/ory/dockertest/v3/docker/pkg/archive
+github.com/ory/dockertest/v3/docker/pkg/fileutils
+github.com/ory/dockertest/v3/docker/pkg/homedir
+github.com/ory/dockertest/v3/docker/pkg/idtools
+github.com/ory/dockertest/v3/docker/pkg/ioutils
+github.com/ory/dockertest/v3/docker/pkg/jsonmessage
+github.com/ory/dockertest/v3/docker/pkg/longpath
+github.com/ory/dockertest/v3/docker/pkg/mount
+github.com/ory/dockertest/v3/docker/pkg/pools
+github.com/ory/dockertest/v3/docker/pkg/stdcopy
+github.com/ory/dockertest/v3/docker/pkg/system
+github.com/ory/dockertest/v3/docker/types
+github.com/ory/dockertest/v3/docker/types/blkiodev
+github.com/ory/dockertest/v3/docker/types/container
+github.com/ory/dockertest/v3/docker/types/filters
+github.com/ory/dockertest/v3/docker/types/mount
+github.com/ory/dockertest/v3/docker/types/network
+github.com/ory/dockertest/v3/docker/types/registry
+github.com/ory/dockertest/v3/docker/types/strslice
+github.com/ory/dockertest/v3/docker/types/versions
 # github.com/parnurzeal/gorequest v0.2.15
 github.com/parnurzeal/gorequest
-# github.com/pkg/errors v0.8.1
+# github.com/pkg/errors v0.9.1
 github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 github.com/pmezard/go-difflib/difflib
 # github.com/satori/go.uuid v1.2.0
 github.com/satori/go.uuid
-# github.com/sirupsen/logrus v1.3.0
+# github.com/sirupsen/logrus v1.4.2
 github.com/sirupsen/logrus
 # github.com/stretchr/testify v1.7.0
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/require
 # github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
 github.com/xlzd/gotp
-# golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
-golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20190311183353-d8887717615a
+# golang.org/x/net v0.0.0-20191003171128-d98b1b443823
 golang.org/x/net/context
 golang.org/x/net/publicsuffix
-# golang.org/x/sys v0.0.0-20190310054646-10058d7d4faa
+# golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a
+golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 # gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
