@@ -66,8 +66,9 @@ github.com/pmezard/go-difflib/difflib
 github.com/satori/go.uuid
 # github.com/sirupsen/logrus v1.3.0
 github.com/sirupsen/logrus
-# github.com/stretchr/testify v1.2.2
+# github.com/stretchr/testify v1.7.0
 github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
 # github.com/xlzd/gotp v0.0.0-20181030022105-c8557ba2c119
 github.com/xlzd/gotp
 # golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
@@ -78,3 +79,5 @@ golang.org/x/net/publicsuffix
 # golang.org/x/sys v0.0.0-20190310054646-10058d7d4faa
 golang.org/x/sys/unix
 golang.org/x/sys/windows
+# gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+gopkg.in/yaml.v3
