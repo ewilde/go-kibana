@@ -373,7 +373,7 @@ func Test_SearchRead_Unknown_Search_Returns_404(t *testing.T) {
 	searchClient := client.Search()
 	_, err := searchClient.GetById(uuid.NewV4().String())
 
-	require.NoError(t, err, "Expected to get a 404 error")
+	require.Error(t, err, "Expected to get a 404 error")
 	httpErr, ok := err.(*HttpError)
 	require.True(t, ok, "Expected http error")
 	assert.Equal(t, 404, httpErr.Code)
