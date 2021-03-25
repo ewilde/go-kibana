@@ -6,6 +6,7 @@ import (
 	goversion "github.com/mcuadros/go-version"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func newTestVisualizationRequestBuilder() *VisualizationRequestBuilder {
@@ -25,12 +26,12 @@ func Test_VisualizationCreateFromSavedSearch(t *testing.T) {
 
 	request, err := newTestVisualizationRequestBuilder().
 		Build(client.Config.KibanaVersion)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	response, err := visualizationApi.Create(request)
+	require.NoError(t, err)
 	defer visualizationApi.Delete(response.Id)
 
-	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
 	assert.Equal(t, request.Attributes.VisualizationState, response.Attributes.VisualizationState)
@@ -61,12 +62,12 @@ func Test_VisualizationCreateWithReferences(t *testing.T) {
 	})
 	request, err := builder.
 		Build(client.Config.KibanaVersion)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	response, err := visualizationApi.Create(request)
+	require.NoError(t, err)
 	defer visualizationApi.Delete(response.Id)
 
-	assert.Nil(t, err)
 	assert.NotNil(t, response)
 	assert.Equal(t, request.Attributes.Title, response.Attributes.Title)
 	assert.Equal(t, request.Attributes.VisualizationState, response.Attributes.VisualizationState)
@@ -87,15 +88,15 @@ func Test_VisualizationRead(t *testing.T) {
 
 	request, err := newTestVisualizationRequestBuilder().
 		Build(client.Config.KibanaVersion)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	createdVisualization, err := visualizationApi.Create(request)
+	require.NoError(t, err, "Error creating visualization")
 	defer visualizationApi.Delete(createdVisualization.Id)
-	assert.Nil(t, err, "Error creating visualization")
 
 	readVisualization, err := visualizationApi.GetById(createdVisualization.Id)
 
-	assert.Nil(t, err, "Error getting visualization by id")
+	require.NoError(t, err, "Error getting visualization by id")
 	assert.NotNil(t, readVisualization, "Visualization retrieved from get by id was null.")
 
 	assert.Equal(t, request.Attributes.Title, readVisualization.Attributes.Title)
@@ -110,12 +111,9 @@ func Test_VisualizationRead_Unknown_Visualization_Returns_404(t *testing.T) {
 	visualizationClient := client.Visualization()
 	_, err := visualizationClient.GetById(uuid.NewV4().String())
 
-	assert.NotNil(t, err, "Expected to get a 404 error")
+	require.Error(t, err, "Expected to get a 404 error")
 	httpErr, ok := err.(*HttpError)
-	if !ok {
-		t.Error("Expected http error")
-	}
-
+	require.True(t, ok, "Expected http error")
 	assert.Equal(t, 404, httpErr.Code)
 }
 
@@ -128,14 +126,14 @@ func Test_VisualizationList(t *testing.T) {
 
 	request, err := newTestVisualizationRequestBuilder().
 		Build(client.Config.KibanaVersion)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	createdVisualization, err := visualizationApi.Create(request)
+	require.NoError(t, err, "Error creating visualization")
 	defer visualizationApi.Delete(createdVisualization.Id)
-	assert.Nil(t, err, "Error creating visualization")
 
 	listVisualization, err := visualizationApi.List()
-	assert.Nil(t, err, "Error listing visualizations")
+	require.NoError(t, err, "Error listing visualizations")
 	assert.NotNil(t, listVisualization, "Response from list visualization is null")
 	assert.NotEmpty(t, listVisualization, "Response from list visualization is empty")
 }
@@ -146,14 +144,14 @@ func Test_VisualizationUpdate(t *testing.T) {
 
 	request, err := newTestVisualizationRequestBuilder().
 		Build(client.Config.KibanaVersion)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	createdVisualization, err := visualizationApi.Create(request)
+	require.NoError(t, err, "Error creating visualization")
 	defer visualizationApi.Delete(createdVisualization.Id)
-	assert.Nil(t, err, "Error creating visualization")
 
 	createdVisualization.Attributes.Title = "China errors updated"
 	updatedVisualization, err := visualizationApi.Update(createdVisualization.Id, &UpdateVisualizationRequest{Attributes: createdVisualization.Attributes})
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "China errors updated", updatedVisualization.Attributes.Title)
 }
