@@ -119,7 +119,7 @@ type SearchKibanaSavedObjectMeta struct {
 
 type SearchSource struct {
 	IndexId      string          `json:"index"`
-	IndexRefName string          `json:"indexRefName"`
+	IndexRefName string          `json:"indexRefName,omitempty"`
 	HighlightAll bool            `json:"highlightAll"`
 	Version      bool            `json:"version"`
 	Query        interface{}     `json:"query,omitempty"`
