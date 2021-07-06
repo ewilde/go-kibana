@@ -36,7 +36,7 @@ func getUrlFromVersion(version string, key string, config *Config, name string, 
 
 type IndexPatternClient interface {
 	SetDefault(indexPatternId string) error
-	Create() (*IndexPatternCreateResult, error)
+	Create(*IndexPatternRequestBuilder) (*IndexPatternCreateResult, error)
 	RefreshFields(indexPatternId string) error
 }
 
@@ -73,6 +73,10 @@ type IndexPatternAttributes struct {
 	Fields        string `json:"fields"`
 }
 
+type IndexPatternRequestBuilder struct {
+	attributes *IndexPatternAttributes `json:"attributes"`
+}
+
 type metaFieldsResult struct {
 	Fields []metaFields `json:"fields"`
 }
@@ -89,6 +93,22 @@ type metaFields struct {
 
 type valuePair struct {
 	Value string `json:"value"`
+}
+
+func NewIndexPatternRequestBuilder() *IndexPatternRequestBuilder {
+	return &IndexPatternRequestBuilder{
+		attributes: &IndexPatternAttributes{},
+	}
+}
+
+func (builder *IndexPatternRequestBuilder) WithTitle(title string) *IndexPatternRequestBuilder {
+	builder.attributes.Title = title
+	return builder
+}
+
+func (builder *IndexPatternRequestBuilder) WithTimeField(timeField string) *IndexPatternRequestBuilder {
+	builder.attributes.TimeFieldName = timeField
+	return builder
 }
 
 func (api *IndexPatternClient600) SetDefault(indexPatternId string) error {
@@ -108,11 +128,11 @@ func (api *IndexPatternClient600) SetDefault(indexPatternId string) error {
 	return nil
 }
 
-func (api *IndexPatternClient600) Create() (*IndexPatternCreateResult, error) {
-	uri := getUrlFromVersion(api.config.KibanaVersion, "create_index", api.config, "logstash-*", "")
+func (api *IndexPatternClient600) Create(request *IndexPatternRequestBuilder) (*IndexPatternCreateResult, error) {
+	uri := getUrlFromVersion(api.config.KibanaVersion, "create_index", api.config, request.attributes.Title, "")
 	response, body, errs := api.client.Post(uri).
 		Set("kbn-version", api.config.KibanaVersion).
-		Send("{\"attributes\":{\"title\":\"logstash-*\",\"timeFieldName\":\"@timestamp\"}}").End()
+		Send(request).End()
 
 	if errs != nil {
 		return nil, errs[0]
@@ -196,11 +216,11 @@ func (api *IndexPatternClient553) SetDefault(indexPatternId string) error {
 	return nil
 }
 
-func (api *IndexPatternClient553) Create() (*IndexPatternCreateResult, error) {
-	uri := getUrlFromVersion(api.config.KibanaVersion, "create_index", api.config, "logstash-*", "")
+func (api *IndexPatternClient553) Create(request *IndexPatternRequestBuilder) (*IndexPatternCreateResult, error) {
+	uri := getUrlFromVersion(api.config.KibanaVersion, "create_index", api.config, request.attributes.Title, "")
 	response, body, errs := api.client.Post(uri).
 		Set("kbn-version", api.config.KibanaVersion).
-		Send("{\"title\":\"logstash-*\",\"timeFieldName\":\"@timestamp\"}").End()
+		Send(request.attributes).End()
 
 	if errs != nil {
 		return nil, errs[0]
