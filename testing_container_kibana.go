@@ -70,8 +70,9 @@ func newKibanaContainer(pool *dockertest.Pool, elasticSearch *elasticSearchConta
 			return err
 		}
 
+		req := NewIndexPatternRequestBuilder().WithTitle("logstash-*").WithTimeField("@timestamp")
 		indexPatternClient := client.IndexPattern()
-		indexPatternCreateResult, err = indexPatternClient.Create()
+		indexPatternCreateResult, err = indexPatternClient.Create(req)
 		if err != nil {
 			log.Printf("Could not create index pattern:%s\n", err)
 			return err
