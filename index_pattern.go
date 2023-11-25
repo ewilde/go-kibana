@@ -38,6 +38,7 @@ type IndexPatternClient interface {
 	SetDefault(indexPatternId string) error
 	Create() (*IndexPatternCreateResult, error)
 	RefreshFields(indexPatternId string) error
+	CreateFromRequest(pattern IndexPattern) (*IndexPatternCreateResult, error)
 }
 
 type IndexPatternClient553 struct {
@@ -68,6 +69,7 @@ type IndexPatternCreateResult553 struct {
 }
 
 type IndexPatternAttributes struct {
+	Name          string `json:"name"`
 	Title         string `json:"title"`
 	TimeFieldName string `json:"timeFieldName"`
 	Fields        string `json:"fields"`
@@ -179,6 +181,29 @@ func (api *IndexPatternClient600) RefreshFields(indexPatternId string) error {
 	return nil
 }
 
+func (api *IndexPatternClient600) CreateFromRequest(pattern IndexPattern) (*IndexPatternCreateResult, error) {
+	uri := getUrlFromVersion(api.config.KibanaVersion, "create_index", api.config, pattern.Attributes.Name, "")
+	response, body, errs := api.client.Post(uri).
+		Set("kbn-version", api.config.KibanaVersion).
+		Send(pattern).End()
+
+	if errs != nil {
+		return nil, errs[0]
+	}
+
+	if response.StatusCode >= 300 {
+		return nil, errors.New(fmt.Sprintf("Status: %d, %s", response.StatusCode, body))
+	}
+
+	indexPatternCreateResult := &IndexPatternCreateResult{}
+	err := json.Unmarshal([]byte(body), indexPatternCreateResult)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse fields from index pattern create response, error: %v", err)
+	}
+
+	return indexPatternCreateResult, nil
+}
+
 func (api *IndexPatternClient553) SetDefault(indexPatternId string) error {
 	response, body, err := api.client.Post(fmt.Sprintf("%s/api/kibana/settings/defaultIndex", api.config.KibanaBaseUri)).
 		Set("kbn-version", api.config.KibanaVersion).
@@ -275,4 +300,8 @@ func (api *IndexPatternClient553) RefreshFields(indexPatternId string) error {
 	}
 
 	return nil
+}
+
+func (api *IndexPatternClient553) CreateFromRequest(pattern IndexPattern) (*IndexPatternCreateResult, error) {
+	return nil, nil
 }
