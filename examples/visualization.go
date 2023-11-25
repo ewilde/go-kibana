@@ -1,6 +1,6 @@
 package examples
 
-import "github.com/ewilde/go-kibana"
+import "github.com/irfannurhakim/go-kibana"
 
 func createVisualization(search *kibana.Search) (*kibana.Visualization, error) {
 	client := kibana.NewClient(kibana.NewDefaultConfig())

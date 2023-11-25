@@ -1,7 +1,7 @@
 package examples
 
 import (
-	"github.com/ewilde/go-kibana"
+	"github.com/irfannurhakim/go-kibana"
 )
 
 func createSearch() (*kibana.Search, error) {
